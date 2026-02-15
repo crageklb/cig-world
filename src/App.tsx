@@ -150,7 +150,7 @@ function FlameInteraction({
 }
 
 function App() {
-  const [showDare, setShowDare] = useState(false);
+  const [, setShowDare] = useState(false);
 
   // Light positions - change these to move both light and indicator
   const mainSpotlightPos: [number, number, number] = [0, 3, 5]; // Directly above cigarette

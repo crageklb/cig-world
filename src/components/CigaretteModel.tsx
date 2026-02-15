@@ -8,7 +8,6 @@ Title: Cigarette - daily3D
 */
 
 import * as THREE from 'three'
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 
@@ -19,7 +18,6 @@ type GLTFResult = GLTF & {
   materials: {
     ['default']: THREE.MeshStandardMaterial
   }
-  animations: GLTFAction[]
 }
 
 export function Model(props: JSX.IntrinsicElements['group']) {
