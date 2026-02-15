@@ -176,7 +176,7 @@ function App() {
 
   return (
     <div 
-      className="w-full h-screen relative overflow-hidden" 
+      className="w-full h-dvh relative overflow-hidden" 
       style={{
         background: `
           radial-gradient(ellipse 80% 40% at 50% 0%, rgba(139, 90, 43, 0.3) 0%, transparent 50%),
@@ -196,7 +196,7 @@ function App() {
       />
       
       {/* Title */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-none z-20 w-full px-5">
+      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-20 w-full px-5" style={{ top: 'max(4rem, env(safe-area-inset-top) + 1rem)' }}>
         <div 
           className="title-responsive"
           style={{
@@ -321,7 +321,7 @@ function App() {
       </Canvas>
 
       {/* Main content container */}
-      <div className="absolute inset-0 flex flex-col items-center justify-end pb-5 pointer-events-none z-10">
+      <div className="absolute inset-0 flex flex-col items-center justify-end pointer-events-none z-10" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom) + 1.25rem)' }}>
         <div className="w-full max-w-[700px] px-5 pointer-events-auto">
           {/* Buttons below cigarette */}
           <div className="flex flex-row sm:flex-row max-sm:flex-col gap-4">
