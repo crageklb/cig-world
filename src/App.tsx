@@ -175,17 +175,7 @@ function App() {
   };
 
   return (
-    <div 
-      className="w-full h-dvh relative overflow-hidden" 
-      style={{
-        background: `
-          radial-gradient(ellipse 80% 40% at 50% 0%, rgba(139, 90, 43, 0.3) 0%, transparent 50%),
-          radial-gradient(ellipse 70% 35% at 50% 100%, rgba(160, 100, 40, 0.4) 0%, transparent 60%),
-          radial-gradient(circle at center, #2a2a2a 20%, #000000 60%)
-        `,
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="w-full h-dvh relative overflow-hidden">
       {/* Noise overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.10]"
