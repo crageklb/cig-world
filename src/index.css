@@ -9,6 +9,7 @@ html {
     radial-gradient(ellipse 70% 35% at 50% 100%, rgba(160, 100, 40, 0.4) 0%, transparent 60%),
     radial-gradient(circle at center, #2a2a2a 20%, #000000 60%);
   background-attachment: fixed;
+  overscroll-behavior: none;
 }
 
 body {
@@ -17,6 +18,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: transparent;
+  overscroll-behavior: none;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -28,6 +31,8 @@ body {
 #root {
   width: 100%;
   height: 100%;
+  background: transparent;
+  overscroll-behavior: none;
 }
 
 .title-responsive {
