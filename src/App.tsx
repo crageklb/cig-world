@@ -175,7 +175,7 @@ function App() {
   };
 
   return (
-    <div className="w-full min-h-dvh relative overflow-hidden bg-transparent overscroll-none">
+    <div className="w-full h-dvh relative overflow-hidden">
       {/* Noise overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.10]"
