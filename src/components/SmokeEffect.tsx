@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { extend } from '@react-three/fiber';
+import { getPerformancePreset } from '../utils/deviceDetection';
 
 // Create custom shader material using drei's shaderMaterial helper
 const SmokeMaterial = shaderMaterial(
@@ -11,6 +12,7 @@ const SmokeMaterial = shaderMaterial(
     uTime: 0,
     uOpacity: 1.0,
     uFadeIn: 0.0,
+    uOctaves: 6,
   },
   // Vertex Shader
   /* glsl */ `
@@ -128,6 +130,7 @@ const SmokeMaterial = shaderMaterial(
     uniform float uTime;
     uniform float uOpacity;
     uniform float uFadeIn;
+    uniform int uOctaves;
     
     varying vec3 vPosition;
     varying vec3 vNormal;
@@ -205,8 +208,9 @@ const SmokeMaterial = shaderMaterial(
       float amplitude = 0.5;
       float frequency = 1.0;
       
-      // 6 octaves for very detailed wispy texture
+      // Dynamic octaves based on device performance
       for(int i = 0; i < 6; i++) {
+        if (i >= uOctaves) break;
         value += amplitude * snoise(p * frequency);
         frequency *= 2.0;
         amplitude *= 0.5;
@@ -301,15 +305,26 @@ interface SmokeEffectProps {
 export default function SmokeEffect({ isLit, position = [0, 0.8, 0] }: SmokeEffectProps) {
   const materialRef = useRef<any>(null);
   const fadeInRef = useRef(0);
+  
+  // Get performance settings
+  const perfPreset = useMemo(() => getPerformancePreset(), []);
 
   // Create geometry - using a solid cone for tight, volumetric smoke
   const geometry = useMemo(() => {
     // ConeGeometry: radius, height, radialSegments, heightSegments
-    return new THREE.ConeGeometry(0.02, 2, 32, 64, false);
-  }, []);
+    // Reduce segments on mobile
+    const radialSegments = perfPreset.isMobile ? 16 : 32;
+    const heightSegments = perfPreset.isMobile ? 32 : 64;
+    return new THREE.ConeGeometry(0.02, 2, radialSegments, heightSegments, false);
+  }, [perfPreset]);
 
   useFrame((state, delta) => {
     if (materialRef.current) {
+      // Set octaves if not already set
+      if (materialRef.current.uniforms.uOctaves.value === 6 && perfPreset.smokeOctaves !== 6) {
+        materialRef.current.uniforms.uOctaves.value = Math.min(perfPreset.smokeOctaves, 4); // Cap at 4 for cigarette smoke
+      }
+      
       if (isLit) {
         // Update time for animation
         materialRef.current.uniforms.uTime.value += delta;
@@ -337,6 +352,7 @@ export default function SmokeEffect({ isLit, position = [0, 0.8, 0] }: SmokeEffe
         depthWrite={false}
         side={THREE.FrontSide}
         blending={THREE.NormalBlending}
+        uOctaves={Math.min(perfPreset.smokeOctaves, 4)}
       />
     </mesh>
   );

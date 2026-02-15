@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getPerformancePreset } from '../utils/deviceDetection';
 
 interface LighterFlameProps {
   position: [number, number, number];
@@ -12,6 +13,9 @@ export default function LighterFlame({ position, velocity, intensity = 1.0 }: Li
   const particlesRef = useRef<THREE.Points>(null);
   const lightRef = useRef<THREE.PointLight>(null);
   const fadeInProgress = useRef(0);
+  
+  // Get performance settings
+  const perfPreset = useMemo(() => getPerformancePreset(), []);
   
   // Calculate wind direction and strength from velocity
   const windStrength = useMemo(() => {
@@ -28,7 +32,7 @@ export default function LighterFlame({ position, velocity, intensity = 1.0 }: Li
 
   // Create particle system
   const particles = useMemo(() => {
-    const count = 500;
+    const count = perfPreset.particleCount;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
@@ -63,7 +67,7 @@ export default function LighterFlame({ position, velocity, intensity = 1.0 }: Li
     }
     
     return { positions, colors, sizes, lifetimes, velocities, count };
-  }, []);
+  }, [perfPreset.particleCount]);
 
   // Create custom particle shader
   const particleMaterial = useMemo(() => {

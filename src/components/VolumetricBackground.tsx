@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { extend } from '@react-three/fiber';
+import { getPerformancePreset } from '../utils/deviceDetection';
 
 // Create custom shader material for volumetric background smoke
 const VolumetricSmokeMaterial = shaderMaterial(
@@ -12,6 +13,7 @@ const VolumetricSmokeMaterial = shaderMaterial(
     uOpacity: 0.6,
     uMouse: new THREE.Vector2(0.5, 0.5),
     uMouseVelocity: new THREE.Vector2(0, 0),
+    uOctaves: 7,
   },
   // Vertex Shader
   /* glsl */ `
@@ -30,6 +32,7 @@ const VolumetricSmokeMaterial = shaderMaterial(
     uniform float uOpacity;
     uniform vec2 uMouse;
     uniform vec2 uMouseVelocity;
+    uniform int uOctaves;
     
     varying vec2 vUv;
     varying vec3 vPosition;
@@ -105,8 +108,9 @@ const VolumetricSmokeMaterial = shaderMaterial(
       float amplitude = 0.5;
       float frequency = 1.0;
       
-      // 7 octaves for ultra-smooth detail
+      // Dynamic octaves based on device performance
       for(int i = 0; i < 7; i++) {
+        if (i >= uOctaves) break;
         value += amplitude * snoise(p * frequency);
         frequency *= 2.0;
         amplitude *= 0.5;
@@ -119,8 +123,10 @@ const VolumetricSmokeMaterial = shaderMaterial(
     float turbulence(vec3 p) {
       float t = 0.0;
       float amplitude = 1.0;
+      int turbOctaves = max(2, uOctaves - 2);
       
       for(int i = 0; i < 5; i++) {
+        if (i >= turbOctaves) break;
         t += amplitude * abs(snoise(p));
         p *= 2.0;
         amplitude *= 0.5;
@@ -261,11 +267,19 @@ export default function VolumetricBackground() {
   const velocityRef = useRef(new THREE.Vector2(0, 0));
   const raycaster = useRef(new THREE.Raycaster());
   const mouseVector = useRef(new THREE.Vector2());
+  
+  // Get performance settings
+  const perfPreset = useMemo(() => getPerformancePreset(), []);
 
   useFrame((state, delta) => {
     if (materialRef.current && meshRef.current) {
       // Update time
       materialRef.current.uniforms.uTime.value += delta;
+      
+      // Set octaves if not already set
+      if (materialRef.current.uniforms.uOctaves.value === 7 && perfPreset.smokeOctaves !== 7) {
+        materialRef.current.uniforms.uOctaves.value = perfPreset.smokeOctaves;
+      }
       
       // Keep background fixed to camera position (doesn't zoom or rotate)
       meshRef.current.position.copy(state.camera.position);
@@ -317,12 +331,13 @@ export default function VolumetricBackground() {
     <>
       {/* Large plane behind everything - follows camera so it stays fixed during zoom */}
       <mesh ref={meshRef} scale={[25, 25, 1]}>
-        <planeGeometry args={[1, 1, 128, 128]} />
+        <planeGeometry args={[1, 1, perfPreset.smokeGeometrySegments, perfPreset.smokeGeometrySegments]} />
         <volumetricSmokeMaterial
           ref={materialRef}
           transparent
           depthWrite={false}
           side={THREE.DoubleSide}
+          uOctaves={perfPreset.smokeOctaves}
         />
       </mesh>
     </>
