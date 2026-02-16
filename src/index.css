@@ -26,6 +26,7 @@ body {
   min-height: -webkit-fill-available;
   overflow: hidden;
   background: transparent;
+  color: #1B1B1B;
   font-family: 'Space Mono', monospace;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -314,25 +315,78 @@ body {
 }
 
 @-webkit-keyframes dareSpin {
-  from {
-    -webkit-transform: rotate(0deg);
+  0% {
+    -webkit-transform: rotate(0deg) scale(1);
   }
-  to {
-    -webkit-transform: rotate(360deg);
+  50% {
+    -webkit-transform: rotate(180deg) scale(1.35);
+  }
+  100% {
+    -webkit-transform: rotate(360deg) scale(1);
   }
 }
 @keyframes dareSpin {
-  from {
-    transform: rotate(0deg);
+  0% {
+    transform: rotate(0deg) scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: rotate(180deg) scale(1.35);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
   }
 }
 
 .animate-dare-spin {
   -webkit-animation: dareSpin 2s linear infinite;
   animation: dareSpin 2s linear infinite;
+}
+
+@-webkit-keyframes badgeWiggle {
+  0%, 100% { -webkit-transform: translateX(0); }
+  20% { -webkit-transform: translateX(-4px); }
+  40% { -webkit-transform: translateX(4px); }
+  60% { -webkit-transform: translateX(-3px); }
+  80% { -webkit-transform: translateX(3px); }
+}
+@keyframes badgeWiggle {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.badge-wiggle {
+  -webkit-animation: badgeWiggle 0.4s ease-in-out;
+  animation: badgeWiggle 0.4s ease-in-out;
+}
+
+@-webkit-keyframes subject6SlideUp {
+  0% { -webkit-transform: translateY(100vh); }
+  100% { -webkit-transform: translateY(50%); }
+}
+@keyframes subject6SlideUp {
+  0% { transform: translateY(100vh); }
+  100% { transform: translateY(50%); }
+}
+
+.subject6-slide-up {
+  -webkit-animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-wiggle {
+    -webkit-animation: none;
+    animation: none;
+  }
+  .subject6-slide-up {
+    -webkit-animation: none;
+    animation: none;
+    -webkit-transform: translateY(50%);
+    transform: translateY(50%);
+  }
 }
 
 /* Exaggerated ease-out: strong deceleration at end */

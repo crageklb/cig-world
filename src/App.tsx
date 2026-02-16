@@ -253,7 +253,7 @@ function App() {
           </div>
           <div className="subtitle-intro w-full px-4 mt-2">
             <p className="text-white/50 text-lg md:text-base text-center tracking-tight">
-              An experience inspired by <br /> Giuseppe Corrado Calvo
+              The Official App of Joey's Big Natural Italian Bachelor Bonanza 2026
             </p>
           </div>
         </div>

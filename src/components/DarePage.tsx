@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft } from '@phosphor-icons/react';
+import { ArrowArcRight, ArrowLeft, Cigarette } from '@phosphor-icons/react';
 
 const DARES = [
   "Do 20 push-ups while someone holds a beer on your back!",
@@ -28,85 +28,285 @@ function pickRandomDare() {
   return DARES[Math.floor(Math.random() * DARES.length)];
 }
 
+const PUNISHMENTS = [
+  'You all have to do a shot',
+  'You all have to shotgun a beer',
+];
+
+function pickRandomPunishment() {
+  return PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
+}
+
 interface DarePageProps {
   onBack: () => void;
 }
 
+const SKIPS_INITIAL = 3;
+
 export default function DarePage({ onBack }: DarePageProps) {
-  const [phase, setPhase] = useState<'spinning' | 'revealed'>('spinning');
+  const [phase, setPhase] = useState<'spinning' | 'revealed' | 'punishment' | 'punishmentRevealed'>('spinning');
   const [currentDare, setCurrentDare] = useState('');
+  const [currentPunishment, setCurrentPunishment] = useState('');
+  const [skipsRemaining, setSkipsRemaining] = useState(SKIPS_INITIAL);
+  const [showNoSkipsMessage, setShowNoSkipsMessage] = useState(false);
 
   useEffect(() => {
+    if (phase !== 'spinning') return;
     const timer = setTimeout(() => {
       setPhase('revealed');
       setCurrentDare(pickRandomDare());
     }, 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [phase]);
+
+  const handleNewDare = () => {
+    setPhase('spinning');
+    setCurrentDare('');
+    setCurrentPunishment('');
+    setSkipsRemaining(SKIPS_INITIAL);
+  };
+
+  useEffect(() => {
+    if (!showNoSkipsMessage) return;
+    const timer = setTimeout(() => setShowNoSkipsMessage(false), 2500);
+    return () => clearTimeout(timer);
+  }, [showNoSkipsMessage]);
 
   const handleSkip = () => {
-    setCurrentDare(pickRandomDare());
+    if (skipsRemaining > 0) {
+      setSkipsRemaining((s) => s - 1);
+      setCurrentDare(pickRandomDare());
+    } else {
+      setShowNoSkipsMessage(true);
+    }
   };
 
   const handleAccept = () => {
-    // Stay on dare - user has accepted. Could add feedback like a toast.
+    setPhase('punishment');
+    setCurrentPunishment(pickRandomPunishment());
   };
 
-  return (
-    <div className="w-full min-h-dvh h-dvh bg-black relative flex flex-col">
-      <button
-        onClick={onBack}
-        className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-white/90 hover:text-white active:opacity-80 transition-opacity"
-        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
-        aria-label="Back to home"
-      >
-        <ArrowLeft size={24} weight="regular" />
-        <span className="text-base font-medium">Back</span>
-      </button>
+  useEffect(() => {
+    if (phase !== 'punishment') return;
+    const timer = setTimeout(() => {
+      setPhase('punishmentRevealed');
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [phase]);
 
-      {/* Spinning image - centered, fades out when phase changes */}
+  return (
+    <div className="w-full min-h-dvh h-dvh bg-gray-50 relative flex flex-col">
+      {phase !== 'punishmentRevealed' && (
+        <button
+          onClick={onBack}
+          className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-[#1B1B1B] hover:opacity-80 active:opacity-70 transition-opacity"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+          aria-label="Back to home"
+        >
+          <ArrowLeft size={24} weight="regular" />
+          <span className="text-base font-medium">Big back</span>
+        </button>
+      )}
+
+      {/* Initial spinning image - centered, fades out when dare revealed */}
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${
-          phase === 'revealed' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          phase === 'revealed' || phase === 'punishment' || phase === 'punishmentRevealed' ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
         <img
           src="/Subject%203.png"
           alt=""
-          className="w-48 h-auto max-w-[80vw] animate-dare-spin object-contain"
-          style={{
-            filter: 'drop-shadow(0.5px 0 0 white) drop-shadow(-0.5px 0 0 white) drop-shadow(0 0.5px 0 white) drop-shadow(0 -0.5px 0 white) drop-shadow(0.5px 0.5px 0 white) drop-shadow(-0.5px -0.5px 0 white) drop-shadow(0.5px -0.5px 0 white) drop-shadow(-0.5px 0.5px 0 white)',
-          }}
+          className="w-48 h-auto max-w-[80vw] animate-dare-spin object-contain drop-shadow-lg"
         />
       </div>
 
-      {/* Dare text and buttons - fades in when phase changes */}
+      {/* Punishment revealed only: Subject 6 background - slides up from bottom */}
       <div
-        className={`flex flex-1 flex-col items-center justify-center px-6 transition-opacity duration-500 ${
-          phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-500 ${
+          phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0'
         }`}
-        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 4rem)' }}
+      >
+        <img
+          src="/Subject%206.png"
+          alt=""
+          className={`w-[min(120vw,80rem)] h-auto object-contain opacity-[1] ${
+            phase === 'punishmentRevealed' ? 'subject6-slide-up' : ''
+          }`}
+        />
+      </div>
+
+      {/* Punishment revealed only: gradient overlay - transparent top, white bottom */}
+      <div
+        className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
+          phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, white 100%)' }}
+      />
+
+      {/* Punishment loading: spinning Subject 5 + "Preparing your punishment" */}
+      <div
+        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+          phase === 'punishment' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <img
+          src="/Subject%205.png"
+          alt=""
+          className="w-48 h-auto max-w-[80vw] animate-dare-spin object-contain drop-shadow-lg mb-8"
+        />
+        <p className="text-center text-xl text-[#1B1B1B]" style={{ fontFamily: "'Space Mono', monospace" }}>
+          Preparing your punishment
+        </p>
+      </div>
+
+      {/* Punishment revealed: message + buttons - absolutely centered */}
+      <div
+        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+          phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }}
       >
         <p
-          className="text-center text-xl md:text-2xl text-white leading-relaxed max-w-2xl mb-10"
+          className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
+          style={{ fontFamily: "'Space Mono', monospace" }}
+        >
+          {currentPunishment}
+        </p>
+        {/* Desktop: inline buttons */}
+        <div className="hidden md:flex flex-row gap-4">
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
+          >
+            HOME
+          </button>
+          <button
+            type="button"
+            onClick={handleNewDare}
+            className="px-8 py-3 rounded-lg bg-[#1b1b1b] text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity"
+          >
+            NEW DARE
+          </button>
+        </div>
+      </div>
+
+      {/* No skips left message overlay */}
+      {showNoSkipsMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/60 px-6">
+          <p
+            className="text-center text-xl md:text-2xl font-bold text-white"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            NO SKIPS LEFT BITCH DO IT
+          </p>
+        </div>
+      )}
+
+      {/* Dare text - absolutely centered in viewport */}
+      <div
+        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+          phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }}
+      >
+        <p
+          className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
           style={{ fontFamily: "'Space Mono', monospace" }}
         >
           {currentDare}
         </p>
-        <div className="flex flex-row gap-4">
+        {/* Buttons: fixed at bottom on mobile, inline on desktop */}
+        <p className="hidden md:block text-center text-sm text-[#1B1B1B]/70 mb-2">Did he do it?</p>
+        <span
+          key={skipsRemaining}
+          className={`hidden md:inline-flex items-center justify-center gap-1.5 w-fit px-3 py-1 rounded-full text-xs font-medium mb-4 ${
+            skipsRemaining === 0 ? 'badge-wiggle text-white' : 'text-[#1B1B1B]/70 bg-[#1B1B1B]/10'
+          }`}
+          style={skipsRemaining === 0 ? { backgroundColor: '#dc2626' } : undefined}
+        >
+          <ArrowArcRight size={12} weight="regular" />
+          {skipsRemaining} {skipsRemaining === 1 ? 'skip' : 'skips'} left
+        </span>
+        <div className="hidden md:flex flex-row gap-4">
           <button
             type="button"
             onClick={handleAccept}
-            className="px-8 py-3 rounded-full bg-white text-black font-semibold text-base active:opacity-80 hover:bg-white/90 transition-opacity"
+            className="px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
           >
             Accept
           </button>
           <button
             type="button"
             onClick={handleSkip}
-            className="px-8 py-3 rounded-full border-2 border-white/60 text-white font-semibold text-base active:opacity-80 hover:border-white hover:bg-white/10 transition-all"
+            className="flex items-center justify-center gap-2 px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
           >
+            <ArrowArcRight size={18} weight="bold" />
             Skip
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile: fixed buttons at bottom - dare phase */}
+      <div
+        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 bg-gray-50 transition-opacity duration-500 ${
+          phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}
+      >
+        <p className="text-center text-lg text-[#1B1B1B]">Did he do it?</p>
+        <span
+          key={skipsRemaining}
+          className={`md:hidden inline-flex items-center justify-center mb-2 gap-1.5 w-fit self-center px-3 py-1 rounded-full text-xs font-medium ${
+            skipsRemaining === 0 ? 'badge-wiggle text-white' : 'text-[#1B1B1B]/70 bg-[#1B1B1B]/5'
+          }`}
+          style={skipsRemaining === 0 ? { backgroundColor: '#dc2626' } : undefined}
+        >
+          <ArrowArcRight size={12} weight="regular" />
+          {skipsRemaining} {skipsRemaining === 1 ? 'skip' : 'skips'} left
+        </span>
+        <div className="flex flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleAccept}
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+          >
+            <Cigarette size={20} weight="bold" />
+            HELL YEAH BROTHER
+          </button>
+          <button
+            type="button"
+            onClick={handleSkip}
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+          >
+            <ArrowArcRight size={20} weight="bold" />
+            NOPE
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile: fixed buttons at bottom - punishment phase */}
+      <div
+        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 transition-opacity duration-500 ${
+          phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}
+      >
+        <div className="flex flex-row gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex-1 min-w-0 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+          >
+            HOME
+          </button>
+          <button
+            type="button"
+            onClick={handleNewDare}
+            className="flex-1 min-w-0 py-4 rounded-xl bg-[#1b1b1b] shadow-sm text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity"
+          >
+            NEW DARE
           </button>
         </div>
       </div>
