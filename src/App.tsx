@@ -299,7 +299,7 @@ function App() {
           className="card-smoke card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
             bg-[#242424] shadow-xl transition-colors z-10 bg-cover bg-center touch-manipulation"
         >
-          <span>Smoke</span>
+          <span>Shoot</span>
           <img
             src="/cig-subject.png"
             alt=""

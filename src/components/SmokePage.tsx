@@ -329,12 +329,12 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
             <img
               src="/Subject%209.png"
               alt=""
-              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[0.15] translate-y-[50%]"
+              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[1] translate-y-[50%]"
             />
           </div>
-          {/* Gradient overlay - transparent top, white bottom */}
+          {/* Gradient overlay - same as Dare punishment: transparent top, white bottom */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none z-[1]"
             style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, white 100%)' }}
           />
           <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
@@ -350,7 +350,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
             <button
               type="button"
               onClick={handleRestart}
-              className="flex-1 min-w-0 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
+              className="flex-1 min-w-0 py-4 bg-white rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
             >
               RESTART
             </button>
