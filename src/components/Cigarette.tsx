@@ -8,9 +8,11 @@ interface CigaretteProps {
   onTipPositionChange?: (position: THREE.Vector3 | null) => void;
   flameActive?: boolean;
   shouldLight?: boolean;
+  /** 3D position [x, y, z] - decrease y to move down on screen */
+  position?: [number, number, number];
 }
 
-export default function Cigarette({ onLit, onTipPositionChange, flameActive = false, shouldLight = false }: CigaretteProps) {
+export default function Cigarette({ onLit, onTipPositionChange, flameActive = false, shouldLight = false, position = [0, 0, 5] }: CigaretteProps) {
   const [isLit, setIsLit] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const cigaretteRef = useRef<THREE.Group>(null);
@@ -18,6 +20,7 @@ export default function Cigarette({ onLit, onTipPositionChange, flameActive = fa
   const previousMousePosition = useRef({ x: 0, y: 0 });
   const rotationVelocity = useRef({ x: 0, y: 0 });
   const targetRotation = useRef({ x: Math.PI / 6, y: Math.PI / 4 });
+  const spinStartTime = useRef<number | null>(null);
   const { gl } = useThree();
   
   // Light cigarette from external trigger (flame collision)
@@ -199,6 +202,15 @@ export default function Cigarette({ onLit, onTipPositionChange, flameActive = fa
 
     // Apply rotation with smooth interpolation
     if (cigaretteRef.current) {
+      const elapsed = state.clock.elapsedTime;
+      if (spinStartTime.current === null) spinStartTime.current = elapsed;
+
+      // Intro spin: 360° over 1.5s with exaggerated ease-out
+      const spinDuration = 1.5;
+      const spinProgress = Math.min(1, (elapsed - spinStartTime.current) / spinDuration);
+      const spinEaseOut = 1 - Math.pow(1 - spinProgress, 5); // exaggerated ease-out
+      const spinOffset = spinProgress < 1 ? (1 - spinEaseOut) * Math.PI * 2 : 0;
+
       if (!isDragging) {
         // Add momentum/inertia when not dragging
         rotationVelocity.current.x *= 0.95;
@@ -206,10 +218,11 @@ export default function Cigarette({ onLit, onTipPositionChange, flameActive = fa
         targetRotation.current.x += rotationVelocity.current.x;
         targetRotation.current.y += rotationVelocity.current.y;
       }
-      
-      // Smooth interpolation to target rotation
+
+      // Smooth interpolation to target rotation, plus intro spin on Y axis
+      const targetY = targetRotation.current.y + spinOffset;
       cigaretteRef.current.rotation.x += (targetRotation.current.x - cigaretteRef.current.rotation.x) * 0.1;
-      cigaretteRef.current.rotation.y += (targetRotation.current.y - cigaretteRef.current.rotation.y) * 0.1;
+      cigaretteRef.current.rotation.y += (targetY - cigaretteRef.current.rotation.y) * 0.15;
       
       // Update tip position for collision detection
       if (onTipPositionChange) {
@@ -272,7 +285,7 @@ export default function Cigarette({ onLit, onTipPositionChange, flameActive = fa
       onPointerDown={handlePointerDown}
       onPointerOver={() => gl.domElement.style.cursor = 'grab'}
       onPointerOut={() => !isDragging && (gl.domElement.style.cursor = 'default')}
-      position={[0, 0, 5]} 
+      position={position} 
       rotation={[Math.PI / 6, Math.PI / 4, Math.PI / 2]}
     >
       {/* Cigarette body (white paper) - 20% shorter than previous */}

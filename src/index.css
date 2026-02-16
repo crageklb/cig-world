@@ -4,6 +4,8 @@
 
 html {
   height: 100%;
+  overflow: hidden;
+  background-color: #000000;
   background: 
     radial-gradient(ellipse 80% 40% at 50% 0%, rgba(139, 90, 43, 0.3) 0%, transparent 50%),
     radial-gradient(ellipse 70% 35% at 50% 100%, rgba(160, 100, 40, 0.4) 0%, transparent 60%),
@@ -17,9 +19,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Funnel Sans', sans-serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -30,18 +30,234 @@ body {
   height: 100%;
 }
 
+@keyframes smokeFloat1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(-20px, -30px) scale(1.1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(30px, -50px) scale(0.95);
+    opacity: 0.3;
+  }
+  75% {
+    transform: translate(-10px, -70px) scale(1.05);
+    opacity: 0.38;
+  }
+}
+
+@keyframes smokeFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.35;
+  }
+  33% {
+    transform: translate(40px, -40px) scale(1.15) rotate(45deg);
+    opacity: 0.3;
+  }
+  66% {
+    transform: translate(-30px, -80px) scale(0.9) rotate(90deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes smokeFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  20% {
+    transform: translate(-50px, 20px) scale(1.2);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translate(20px, -30px) scale(0.85);
+    opacity: 0.25;
+  }
+  60% {
+    transform: translate(-20px, -60px) scale(1.1);
+    opacity: 0.32;
+  }
+  80% {
+    transform: translate(40px, -40px) scale(0.95);
+    opacity: 0.28;
+  }
+}
+
+@keyframes smokeFloat4 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.32;
+  }
+  50% {
+    transform: translate(-60px, -50px) scale(1.25) rotate(-90deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes smokeFloat5 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.38;
+  }
+  30% {
+    transform: translate(50px, -20px) scale(0.9);
+    opacity: 0.3;
+  }
+  70% {
+    transform: translate(-40px, -70px) scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+@keyframes smokeFloat6 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.28;
+  }
+  25% {
+    transform: translate(-35px, 30px) scale(1.1) rotate(60deg);
+    opacity: 0.33;
+  }
+  75% {
+    transform: translate(45px, -55px) scale(0.92) rotate(-60deg);
+    opacity: 0.26;
+  }
+}
+
+@keyframes smokeFloat7 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.36;
+  }
+  40% {
+    transform: translate(25px, -45px) scale(1.18);
+    opacity: 0.3;
+  }
+  80% {
+    transform: translate(-55px, -25px) scale(0.88);
+    opacity: 0.34;
+  }
+}
+
+@keyframes smokeFloat8 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(60px, -60px) scale(1.3) rotate(120deg);
+    opacity: 0.24;
+  }
+}
+
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes subtitleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes cardsSlideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(20%);
+  }
+}
+
+@keyframes cardDareRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes cardSmokeRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes cardSmokeOverlap {
+  0% {
+    margin-left: -4rem;
+  }
+  100% {
+    margin-left: -1.5rem;
+  }
+}
+
+/* Exaggerated ease-out: strong deceleration at end */
+:root {
+  --ease-out-exaggerated: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Title/subtitle: fade in after cigarette (1.5s), slow fade with exaggerated ease-out */
+.title-intro {
+  opacity: 0;
+  animation: titleFadeIn 1.2s var(--ease-out-exaggerated) 1.5s forwards;
+}
+
+.subtitle-intro {
+  opacity: 0;
+  animation: subtitleFadeIn 1.2s var(--ease-out-exaggerated) 1.5s forwards;
+}
+
+/* Cards: slide up after title/subtitle (1.5s + 1.2s = 2.7s) */
+.cards-slide-up {
+  transform: translateY(100%);
+  animation: cardsSlideUp 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+}
+
+.card-dare {
+  animation: cardDareRotate 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+  transform-origin: bottom center;
+}
+
+.card-smoke {
+  margin-left: -4rem;
+  animation: cardSmokeRotate 0.6s var(--ease-out-exaggerated) 2.7s forwards,
+    cardSmokeOverlap 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+  transform-origin: bottom center;
+}
+
 .title-responsive {
-  font-size: min(12rem, calc(100vw - 40px));
+  font-size: min(11rem, calc(100vw - 40px));
 }
 
 @media (max-width: 480px) {
   .title-responsive {
-    font-size: 9rem;
+    font-size: 8rem;
   }
 }
 
 @media (max-width: 360px) {
   .title-responsive {
-    font-size: 8rem;
+    font-size: 7rem;
   }
 }
