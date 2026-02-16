@@ -205,8 +205,8 @@ export default function Cigarette({ onLit, onTipPositionChange, flameActive = fa
       const elapsed = state.clock.elapsedTime;
       if (spinStartTime.current === null) spinStartTime.current = elapsed;
 
-      // Intro spin: 360° over 1.5s with exaggerated ease-out
-      const spinDuration = 1.5;
+      // Intro spin: 360° over 1s with exaggerated ease-out
+      const spinDuration = 1;
       const spinProgress = Math.min(1, (elapsed - spinStartTime.current) / spinDuration);
       const spinEaseOut = 1 - Math.pow(1 - spinProgress, 5); // exaggerated ease-out
       const spinOffset = spinProgress < 1 ? (1 - spinEaseOut) * Math.PI * 2 : 0;

@@ -1,156 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { IconContext, Lightning } from '@phosphor-icons/react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import Cigarette from './components/Cigarette';
-import { AcceleratedZoom } from './components/AcceleratedZoom';
-import TargetedSpotlight from './components/TargetedSpotlight';
-import LighterFlame from './components/LighterFlame';
-import * as THREE from 'three';
 
-// Component to handle flame interaction and collision detection
-function FlameInteraction({
-  onCigaretteLit,
-  cigarettePosition = [0, 0, 5],
-}: {
-  onCigaretteLit: () => void;
-  cigarettePosition?: [number, number, number];
-}) {
-  const { camera, gl, raycaster, pointer } = useThree();
-  const [flameActive, setFlameActive] = useState(false);
-  const [flamePosition, setFlamePosition] = useState<[number, number, number]>([0, 0, 5]);
-  const [flameVelocity, setFlameVelocity] = useState<[number, number, number]>([0, 0, 0]);
-  const [shouldLightCig, setShouldLightCig] = useState(false);
-  const [cigLit, setCigLit] = useState(false);
-  const [tipPos, setTipPos] = useState<THREE.Vector3 | null>(null);
-  
-  const previousPosition = useRef<THREE.Vector3>(new THREE.Vector3());
-  const isDraggingFlame = useRef(false);
-  const interactionPlaneRef = useRef<THREE.Mesh>(null);
-  const collisionTimer = useRef(0);
-  
-  // Update flame position from mouse
-  const updateFlamePosition = (clientX: number, clientY: number) => {
-    // Convert screen coordinates to normalized device coordinates
-    const x = (clientX / gl.domElement.clientWidth) * 2 - 1;
-    const y = -(clientY / gl.domElement.clientHeight) * 2 + 1;
-    
-    pointer.set(x, y);
-    raycaster.setFromCamera(pointer, camera);
-    
-    // Get a point at a fixed distance from camera (closer to camera)
-    const direction = raycaster.ray.direction.clone();
-    const distance = 2.5; // Reduced from 3 to 2.5 to bring flame closer
-    const point = camera.position.clone().add(direction.multiplyScalar(distance));
-    
-    // Calculate velocity
-    const velocity: [number, number, number] = [
-      point.x - previousPosition.current.x,
-      point.y - previousPosition.current.y,
-      point.z - previousPosition.current.z,
-    ];
-    
-    setFlamePosition([point.x, point.y, point.z]);
-    setFlameVelocity(velocity);
-    previousPosition.current.copy(point);
-  };
-  
-  // Handle pointer down on interaction plane
-  const handlePointerDown = (e: any) => {
-    if (e.intersections.length > 0) {
-      // Calculate position at fixed distance from camera
-      const x = (e.clientX / gl.domElement.clientWidth) * 2 - 1;
-      const y = -(e.clientY / gl.domElement.clientHeight) * 2 + 1;
-      
-      pointer.set(x, y);
-      raycaster.setFromCamera(pointer, camera);
-      
-      const direction = raycaster.ray.direction.clone();
-      const distance = 2.5; // Reduced from 3 to 2.5
-      const point = camera.position.clone().add(direction.multiplyScalar(distance));
-      
-      setFlameActive(true);
-      setFlamePosition([point.x, point.y, point.z]);
-      previousPosition.current.copy(point);
-      isDraggingFlame.current = true;
-      
-      // Add global listeners
-      const handleMove = (moveEvent: PointerEvent) => {
-        if (isDraggingFlame.current) {
-          updateFlamePosition(moveEvent.clientX, moveEvent.clientY);
-        }
-      };
-      
-      const handleUp = () => {
-        isDraggingFlame.current = false;
-        setFlameActive(false);
-        setFlameVelocity([0, 0, 0]);
-        collisionTimer.current = 0;
-        window.removeEventListener('pointermove', handleMove);
-        window.removeEventListener('pointerup', handleUp);
-      };
-      
-      window.addEventListener('pointermove', handleMove);
-      window.addEventListener('pointerup', handleUp);
-    }
-  };
-  
-  // Check collision between flame and cigarette tip
-  useFrame((_state, delta) => {
-    if (flameActive && tipPos && !cigLit) {
-      const flamePosVec = new THREE.Vector3(...flamePosition);
-      const distance = flamePosVec.distanceTo(tipPos);
-      
-      // If flame is close enough to tip
-      if (distance < 0.4) {
-        collisionTimer.current += delta;
-        
-        // Light cigarette after sustained contact
-        if (collisionTimer.current > 0.5) {
-          setShouldLightCig(true);
-          setCigLit(true);
-          setFlameActive(false);
-          onCigaretteLit();
-        }
-      } else {
-        collisionTimer.current = 0;
-      }
-    }
-  });
-  
-  return (
-    <>
-      {/* Invisible interaction plane for click detection */}
-      <mesh
-        ref={interactionPlaneRef}
-        position={[0, 0, 5]}
-        onPointerDown={handlePointerDown}
-        visible={false}
-      >
-        <planeGeometry args={[20, 20]} />
-        <meshBasicMaterial transparent opacity={0} />
-      </mesh>
-      
-      {/* Render flame when active */}
-      {flameActive && (
-        <LighterFlame
-          position={flamePosition}
-          velocity={flameVelocity}
-          intensity={0.3}
-        />
-      )}
-      
-      {/* Pass lighting state to Cigarette */}
-      <Cigarette
-        onLit={onCigaretteLit}
-        flameActive={flameActive}
-        shouldLight={shouldLightCig}
-        onTipPositionChange={setTipPos}
-        position={cigarettePosition}
-      />
-    </>
-  );
-}
+const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
 function App() {
   const [, setShowDare] = useState(false);
@@ -193,7 +44,7 @@ function App() {
       />
 
       {/* Hero section */}
-      <section className="relative h-[70vh]">
+      <section className="relative h-[70vh] min-h-[32rem] -mt-12">
       {/* CSS Animated blurry gradient smoke effect - multiple layers */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Layer 1 */}
@@ -328,134 +179,54 @@ function App() {
         />
       </div>
       
-      {/* Title - below cigarette */}
-      <div className="title-intro absolute left-1/2 -translate-x-1/2 pointer-events-none z-5 w-full px-5" style={{ top: 'max(14rem, env(safe-area-inset-top) + 12rem)' }}>
-        <div 
-          className="title-responsive"
-          style={{
-            fontFamily: "'Manufacturing Consent', sans-serif",
-            color: 'white',
-            textAlign: 'center',
-            letterSpacing: '0em',
-            lineHeight: '.7',
-          }}
+      {/* Cigarette, title and subtitle - grouped with fixed heights so position is viewport-stable */}
+      <div
+        className="absolute inset-x-0 flex flex-col items-center pointer-events-none z-5 px-5"
+        style={{ top: 'max(0.2rem, env(safe-area-inset-top))' }}
+      >
+        {/* Fixed-height cigarette canvas - lazy-loaded, does not block initial render */}
+        <div className="relative w-full max-w-xl h-[40rem] shrink-0 pointer-events-auto">
+          <Suspense fallback={<div className="w-full h-full bg-transparent" aria-hidden />}>
+            <CigaretteScene
+              onCigaretteLit={handleCigaretteLit}
+              cigarettePosition={cigarettePosition}
+              mainSpotlightPos={mainSpotlightPos}
+              rimLightPos={rimLightPos}
+              fillLightPos={fillLightPos}
+              frontFillLightPos={frontFillLightPos}
+              mainSpotlightIntensity={mainSpotlightIntensity}
+              rimLightIntensity={rimLightIntensity}
+              fillLightIntensity={fillLightIntensity}
+              frontFillLightIntensity={frontFillLightIntensity}
+              showLightIndicators={showLightIndicators}
+            />
+          </Suspense>
+        </div>
+        {/* Title and subtitle - flow below cigarette */}
+        <div
+          className="title-intro flex flex-col items-center gap-4 w-full px-5"
+          style={{ marginTop: '-24rem' }}
         >
-          <div>Cig</div>
-          <div>World</div>
+          <div
+            className="title-responsive"
+            style={{
+              fontFamily: "'Manufacturing Consent', sans-serif",
+              color: 'white',
+              textAlign: 'center',
+              letterSpacing: '0em',
+              lineHeight: '.7',
+            }}
+          >
+            <div>Cig</div>
+            <div>World</div>
+          </div>
+          <div className="subtitle-intro w-full px-12">
+            <p className="text-white/70 text-xl md:text-base text-center tracking-tight">
+              An experience inspired by Giuseppe Corrado Calvo
+            </p>
+          </div>
         </div>
       </div>
-
-      {/* Subtitle */}
-      <div className="subtitle-intro absolute left-1/2 -translate-x-1/2 bottom-[20%] pointer-events-none z-5 w-full px-12">
-        <p className="text-white/70 text-xl md:text-base text-center tracking-tight">
-          An experience inspired by Giuseppe Corrado Calvo
-        </p>
-      </div>
-      
-      {/* 3D Canvas for cigarette */}
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 50 }}
-        className="z-20 absolute inset-0"
-      >
-        {/* Custom accelerated zoom control */}
-        <AcceleratedZoom />
-        
-        {/* Lighting */}
-        <ambientLight intensity={0.05} />
-        
-        {/* Main softbox-style spotlight from above */}
-        <TargetedSpotlight
-          position={mainSpotlightPos}
-          targetPosition={[0, 0, 5]}
-          angle={0.5}
-          penumbra={0.8}
-          intensity={mainSpotlightIntensity}
-          color="#fff3e3"
-          castShadow
-        />
-        {/* Main spotlight indicator and cone */}
-        {showLightIndicators && (
-          <group position={mainSpotlightPos}>
-            <mesh>
-              <sphereGeometry args={[0.2, 16, 16]} />
-              <meshBasicMaterial color="#fff3e3" />
-            </mesh>
-            <mesh rotation={[Math.PI, 0, 0]} position={[0, -2, 0]}>
-              <coneGeometry args={[2, 4, 16, 1, true]} />
-              <meshBasicMaterial color="#fff3e3" transparent opacity={0.1} side={2} />
-            </mesh>
-          </group>
-        )}
-        
-        {/* Rim light from side for definition */}
-        <TargetedSpotlight
-          position={rimLightPos}
-          targetPosition={[0, 0, 5]}
-          angle={0.3}
-          penumbra={0.9}
-          intensity={rimLightIntensity}
-          color="#ffeedd"
-        />
-        {/* Rim light indicator and cone */}
-        {showLightIndicators && (
-          <group position={rimLightPos}>
-            <mesh>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#ffeedd" />
-            </mesh>
-            <mesh rotation={[0, 0, -Math.PI / 2]} position={[-2, 0, 0]}>
-              <coneGeometry args={[1.2, 4, 16, 1, true]} />
-              <meshBasicMaterial color="#ffeedd" transparent opacity={0.1} side={2} />
-            </mesh>
-          </group>
-        )}
-        
-        {/* Subtle fill light from below */}
-        <pointLight position={fillLightPos} intensity={fillLightIntensity} color="#ffebd1" />
-        {/* Fill light indicator - point light shows as sphere with glow lines */}
-        {showLightIndicators && (
-          <group position={fillLightPos}>
-            <mesh>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#ffebd1" />
-            </mesh>
-            {/* Wireframe sphere to show omnidirectional light */}
-            <mesh>
-              <sphereGeometry args={[0.8, 16, 16]} />
-              <meshBasicMaterial color="#ffebd1" wireframe opacity={0.2} transparent />
-            </mesh>
-          </group>
-        )}
-        
-        {/* Front fill light - illuminates the front/top of cigarette */}
-        <pointLight position={frontFillLightPos} intensity={frontFillLightIntensity} color="#ffffff" />
-        {showLightIndicators && (
-          <group position={frontFillLightPos}>
-            <mesh>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#ffffff" />
-            </mesh>
-            <mesh>
-              <sphereGeometry args={[0.8, 16, 16]} />
-              <meshBasicMaterial color="#ffffff" wireframe opacity={0.2} transparent />
-            </mesh>
-          </group>
-        )}
-        
-        {/* Flame interaction and cigarette */}
-        <FlameInteraction
-          onCigaretteLit={handleCigaretteLit}
-          cigarettePosition={cigarettePosition}
-        />
-        
-        {/* Camera controls - zoom disabled, using custom AcceleratedZoom */}
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          enableRotate={false}
-          autoRotate={false}
-        />
-      </Canvas>
       </section>
 
       {/* Mobile: fixed buttons peeking from bottom */}

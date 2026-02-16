@@ -157,22 +157,22 @@ body {
 @keyframes titleFadeIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, 12px);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
 @keyframes subtitleFadeIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, 12px);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
@@ -217,32 +217,32 @@ body {
   --ease-out-exaggerated: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Title/subtitle: fade in after cigarette (1.5s), slow fade with exaggerated ease-out */
+/* Title/subtitle: fade in after cigarette (0.6s), slow fade with exaggerated ease-out */
 .title-intro {
   opacity: 0;
-  animation: titleFadeIn 1.2s var(--ease-out-exaggerated) 1.5s forwards;
+  animation: titleFadeIn 1s var(--ease-out-exaggerated) 0.6s forwards;
 }
 
 .subtitle-intro {
   opacity: 0;
-  animation: subtitleFadeIn 1.2s var(--ease-out-exaggerated) 1.5s forwards;
+  animation: subtitleFadeIn 1s var(--ease-out-exaggerated) 0.6s forwards;
 }
 
-/* Cards: slide up after title/subtitle (1.5s + 1.2s = 2.7s) */
+/* Cards: slide up after title/subtitle (0.6s + 1s = 1.6s) */
 .cards-slide-up {
   transform: translateY(100%);
-  animation: cardsSlideUp 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+  animation: cardsSlideUp 0.5s var(--ease-out-exaggerated) 1.4s forwards;
 }
 
 .card-dare {
-  animation: cardDareRotate 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+  animation: cardDareRotate 0.5s var(--ease-out-exaggerated) 1.4s forwards;
   transform-origin: bottom center;
 }
 
 .card-smoke {
   margin-left: -4rem;
-  animation: cardSmokeRotate 0.6s var(--ease-out-exaggerated) 2.7s forwards,
-    cardSmokeOverlap 0.6s var(--ease-out-exaggerated) 2.7s forwards;
+  animation: cardSmokeRotate 0.5s var(--ease-out-exaggerated) 1.4s forwards,
+    cardSmokeOverlap 0.5s var(--ease-out-exaggerated) 1.4s forwards;
   transform-origin: bottom center;
 }
 
