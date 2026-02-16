@@ -198,7 +198,7 @@ function App() {
       </div>
 
       {/* Hero section */}
-      <section className="relative h-[70vh] min-h-[32rem] -mt-12">
+      <section className="relative h-[70vh] min-h-[32rem] -mt-24">
       {/* Cigarette, title and subtitle - grouped with fixed heights so position is viewport-stable */}
       <div
         className="absolute inset-x-0 flex flex-col items-center pointer-events-none z-5"
