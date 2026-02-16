@@ -8,8 +8,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
           'three': ['three'],
           'r3f': ['@react-three/fiber', '@react-three/drei'],
+          'phosphor': ['@phosphor-icons/react'],
         },
       },
     },

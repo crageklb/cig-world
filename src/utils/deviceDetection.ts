@@ -25,6 +25,7 @@ export const getPerformancePreset = () => {
 
   return {
     isMobile,
+    dpr: useLowEndPreset ? 1 : undefined,
     smokeOctaves: useLowEndPreset ? 2 : isMobile ? 3 : 7,
     smokeGeometrySegments: isMobile ? 64 : 128,
     particleCount: useLowEndPreset ? 50 : isMobile ? 100 : 500,

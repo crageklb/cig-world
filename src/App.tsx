@@ -1,10 +1,20 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { IconContext, ArrowLeft } from '@phosphor-icons/react';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
 function App() {
   const [, setShowDare] = useState(false);
+
+  useEffect(() => {
+    const prefetch = () => import('./components/CigaretteScene');
+    if ('requestIdleCallback' in window) {
+      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout?: number }) => number }).requestIdleCallback(prefetch, { timeout: 2000 });
+    } else {
+      setTimeout(prefetch, 100);
+    }
+  }, []);
+
   const [currentPage, setCurrentPage] = useState<'home' | 'dare'>('home');
   const [skipIntro, setSkipIntro] = useState(false);
 
@@ -85,132 +95,122 @@ function App() {
       {/* CSS smoke blobs - fixed full-page, behind content */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Layer 1 */}
-        <div 
-          className="absolute"
+        <div
+          className="smoke-layer smoke-layer-1 absolute"
           style={{
             top: '20%',
             left: '15%',
             width: '50%',
             height: '60%',
             background: 'radial-gradient(ellipse 70% 55% at 40% 45%, rgba(160, 160, 170, 0.9) 0%, transparent 65%)',
-            filter: 'blur(80px)',
             animation: 'smokeFloat1 25s ease-in-out infinite',
           }}
         />
         {/* Layer 2 */}
-        <div 
-          className="absolute"
+        <div
+          className="smoke-layer smoke-layer-2 absolute"
           style={{
             top: '40%',
             left: '55%',
             width: '45%',
             height: '55%',
             background: 'radial-gradient(ellipse 60% 80% at 55% 50%, rgba(150, 155, 165, 0.9) 0%, transparent 60%)',
-            filter: 'blur(100px)',
             animation: 'smokeFloat2 30s ease-in-out infinite',
           }}
         />
         {/* Layer 3 */}
-        <div 
-          className="absolute"
+        <div
+          className="smoke-layer smoke-layer-3 absolute"
           style={{
             top: '10%',
             left: '40%',
             width: '55%',
             height: '50%',
             background: 'radial-gradient(ellipse 75% 45% at 50% 55%, rgba(155, 160, 170, 0.9) 0%, transparent 55%)',
-            filter: 'blur(90px)',
             animation: 'smokeFloat3 35s ease-in-out infinite',
           }}
         />
         {/* Layer 4 */}
-        <div 
-          className="absolute"
+        <div
+          className="smoke-layer smoke-layer-4 absolute"
           style={{
             top: '50%',
             left: '10%',
             width: '40%',
             height: '65%',
             background: 'radial-gradient(ellipse 50% 70% at 45% 40%, rgba(145, 150, 160, 0.9) 0%, transparent 65%)',
-            filter: 'blur(110px)',
             animation: 'smokeFloat4 28s ease-in-out infinite',
           }}
         />
         {/* Layer 5 */}
-        <div 
-          className="absolute"
+        <div
+          className="smoke-layer smoke-layer-5 absolute"
           style={{
             top: '5%',
             left: '65%',
             width: '48%',
             height: '52%',
             background: 'radial-gradient(ellipse 65% 50% at 50% 60%, rgba(155, 160, 170, 0.9) 0%, transparent 58%)',
-            filter: 'blur(95px)',
             animation: 'smokeFloat5 32s ease-in-out infinite',
           }}
         />
-        {/* Layer 6 */}
-        <div 
-          className="absolute"
+        {/* Layer 6 - hidden on mobile */}
+        <div
+          className="smoke-layer smoke-layer-6 absolute"
           style={{
             top: '30%',
             left: '25%',
             width: '52%',
             height: '58%',
             background: 'radial-gradient(ellipse 55% 75% at 48% 52%, rgba(150, 155, 165, 0.9) 0%, transparent 62%)',
-            filter: 'blur(105px)',
             animation: 'smokeFloat6 27s ease-in-out infinite',
           }}
         />
-        {/* Layer 7 */}
-        <div 
-          className="absolute"
+        {/* Layer 7 - hidden on mobile */}
+        <div
+          className="smoke-layer smoke-layer-7 absolute"
           style={{
             top: '15%',
             left: '5%',
             width: '58%',
             height: '48%',
             background: 'radial-gradient(ellipse 80% 48% at 42% 58%, rgba(160, 165, 175, 0.9) 0%, transparent 56%)',
-            filter: 'blur(88px)',
             animation: 'smokeFloat7 33s ease-in-out infinite',
           }}
         />
-        {/* Layer 8 */}
-        <div 
-          className="absolute"
+        {/* Layer 8 - hidden on mobile */}
+        <div
+          className="smoke-layer smoke-layer-8 absolute"
           style={{
             top: '45%',
             left: '50%',
             width: '46%',
             height: '62%',
             background: 'radial-gradient(ellipse 58% 68% at 52% 46%, rgba(145, 150, 160, 0.9) 0%, transparent 64%)',
-            filter: 'blur(98px)',
             animation: 'smokeFloat8 29s ease-in-out infinite',
           }}
         />
-        {/* Layer 9 */}
-        <div 
-          className="absolute"
+        {/* Layer 9 - hidden on mobile */}
+        <div
+          className="smoke-layer smoke-layer-9 absolute"
           style={{
             top: '25%',
             left: '70%',
             width: '42%',
             height: '56%',
             background: 'radial-gradient(ellipse 62% 52% at 55% 48%, rgba(155, 160, 170, 0.9) 0%, transparent 59%)',
-            filter: 'blur(92px)',
             animation: 'smokeFloat1 31s ease-in-out infinite reverse',
           }}
         />
-        {/* Layer 10 */}
-        <div 
-          className="absolute"
+        {/* Layer 10 - hidden on mobile */}
+        <div
+          className="smoke-layer smoke-layer-10 absolute"
           style={{
             top: '35%',
             left: '0%',
             width: '50%',
             height: '70%',
             background: 'radial-gradient(ellipse 68% 58% at 38% 54%, rgba(160, 165, 175, 0.9) 0%, transparent 61%)',
-            filter: 'blur(102px)',
             animation: 'smokeFloat2 26s ease-in-out infinite reverse',
           }}
         />
@@ -225,7 +225,17 @@ function App() {
       >
         {/* Fixed-height cigarette canvas - lazy-loaded, does not block initial render */}
         <div className="relative w-full max-w-xl h-[40rem] shrink-0 pointer-events-auto">
-          <Suspense fallback={<div className="w-full h-full bg-transparent" aria-hidden />}>
+          <Suspense
+            fallback={
+              <div
+                className="w-full h-full flex items-center justify-center bg-black/20"
+                aria-hidden
+                aria-busy="true"
+              >
+                <div className="w-24 h-1 rounded-full bg-white/10 animate-pulse" />
+              </div>
+            }
+          >
             <CigaretteScene
               onCigaretteLit={handleCigaretteLit}
               cigarettePosition={cigarettePosition}
@@ -262,7 +272,7 @@ function App() {
           </div>
           <div className="subtitle-intro w-full px-4 mt-2">
             <p className="text-white/50 text-lg md:text-base text-center tracking-tight">
-              An experience inspired by Giuseppe Corrado Calvo
+              An experience inspired by <br /> Giuseppe Corrado Calvo
             </p>
           </div>
         </div>
@@ -284,6 +294,8 @@ function App() {
           <img
             src="/Subject%203.png"
             alt=""
+            loading="lazy"
+            fetchPriority="low"
             className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_white)_drop-shadow(-0.5px_0_0_white)_drop-shadow(0_0.5px_0_white)_drop-shadow(0_-0.5px_0_white)_drop-shadow(0.5px_0.5px_0_white)_drop-shadow(-0.5px_-0.5px_0_white)_drop-shadow(0.5px_-0.5px_0_white)_drop-shadow(-0.5px_0.5px_0_white)]"
           />
         </button>
@@ -296,6 +308,8 @@ function App() {
           <img
             src="/cig-subject.png"
             alt=""
+            loading="lazy"
+            fetchPriority="low"
             className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_white)_drop-shadow(-0.375px_0_0_white)_drop-shadow(0_0.375px_0_white)_drop-shadow(0_-0.375px_0_white)_drop-shadow(0.375px_0.375px_0_white)_drop-shadow(-0.375px_-0.375px_0_white)_drop-shadow(0.375px_-0.375px_0_white)_drop-shadow(-0.375px_0.375px_0_white)]"
           />
         </a>

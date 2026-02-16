@@ -1,6 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import Cigarette from './Cigarette';
 import { AcceleratedZoom } from './AcceleratedZoom';
 import TargetedSpotlight from './TargetedSpotlight';
@@ -176,7 +175,7 @@ export default function CigaretteScene({
     <Canvas
       camera={{ position: [0, 0, 8], fov: 50 }}
       className="z-20 w-full h-full"
-      dpr={perfPreset.isMobile ? [1, 1.5] : [1, 2]}
+      dpr={perfPreset.dpr !== undefined ? perfPreset.dpr : perfPreset.isMobile ? [1, 1.5] : [1, 2]}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
     >
       <AcceleratedZoom />
@@ -257,12 +256,6 @@ export default function CigaretteScene({
         onCigaretteLit={onCigaretteLit}
         cigarettePosition={cigarettePosition}
         skipIntro={skipIntro}
-      />
-      <OrbitControls
-        enableZoom={false}
-        enablePan={false}
-        enableRotate={false}
-        autoRotate={false}
       />
     </Canvas>
   );

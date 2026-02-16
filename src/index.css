@@ -30,6 +30,35 @@ body {
   height: 100%;
 }
 
+/* Smoke layer blur - reduced on mobile for performance */
+.smoke-layer-1 { filter: blur(80px); }
+.smoke-layer-2 { filter: blur(100px); }
+.smoke-layer-3 { filter: blur(90px); }
+.smoke-layer-4 { filter: blur(110px); }
+.smoke-layer-5 { filter: blur(95px); }
+.smoke-layer-6 { filter: blur(105px); }
+.smoke-layer-7 { filter: blur(88px); }
+.smoke-layer-8 { filter: blur(98px); }
+.smoke-layer-9 { filter: blur(92px); }
+.smoke-layer-10 { filter: blur(102px); }
+
+@media (max-width: 768px) {
+  .smoke-layer-6,
+  .smoke-layer-7,
+  .smoke-layer-8,
+  .smoke-layer-9,
+  .smoke-layer-10 {
+    display: none;
+  }
+  .smoke-layer-1,
+  .smoke-layer-2,
+  .smoke-layer-3,
+  .smoke-layer-4,
+  .smoke-layer-5 {
+    filter: blur(60px);
+  }
+}
+
 @keyframes smokeFloat1 {
   0%, 100% {
     transform: translate(0, 0) scale(1);
