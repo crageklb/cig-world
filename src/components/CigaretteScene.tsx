@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Cigarette from './Cigarette';
@@ -6,13 +6,16 @@ import { AcceleratedZoom } from './AcceleratedZoom';
 import TargetedSpotlight from './TargetedSpotlight';
 import LighterFlame from './LighterFlame';
 import * as THREE from 'three';
+import { getPerformancePreset } from '../utils/deviceDetection';
 
 function FlameInteraction({
   onCigaretteLit,
   cigarettePosition = [0, 0, 5],
+  skipIntro = false,
 }: {
   onCigaretteLit: () => void;
   cigarettePosition?: [number, number, number];
+  skipIntro?: boolean;
 }) {
   const { camera, gl, raycaster, pointer } = useThree();
   const [flameActive, setFlameActive] = useState(false);
@@ -132,6 +135,7 @@ function FlameInteraction({
         shouldLight={shouldLightCig}
         onTipPositionChange={setTipPos}
         position={cigarettePosition}
+        skipIntro={skipIntro}
       />
     </>
   );
@@ -149,6 +153,7 @@ export interface CigaretteSceneProps {
   fillLightIntensity: number;
   frontFillLightIntensity: number;
   showLightIndicators: boolean;
+  skipIntro?: boolean;
 }
 
 export default function CigaretteScene({
@@ -163,11 +168,16 @@ export default function CigaretteScene({
   fillLightIntensity,
   frontFillLightIntensity,
   showLightIndicators,
+  skipIntro = false,
 }: CigaretteSceneProps) {
+  const perfPreset = useMemo(() => getPerformancePreset(), []);
+
   return (
     <Canvas
       camera={{ position: [0, 0, 8], fov: 50 }}
       className="z-20 w-full h-full"
+      dpr={perfPreset.isMobile ? [1, 1.5] : [1, 2]}
+      gl={{ antialias: false, powerPreference: 'high-performance' }}
     >
       <AcceleratedZoom />
       <ambientLight intensity={0.05} />
@@ -178,7 +188,8 @@ export default function CigaretteScene({
         penumbra={0.8}
         intensity={mainSpotlightIntensity}
         color="#fff3e3"
-        castShadow
+        castShadow={perfPreset.enableShadows}
+        shadowMapSize={1024}
       />
       {showLightIndicators && (
         <group position={mainSpotlightPos}>
@@ -192,55 +203,60 @@ export default function CigaretteScene({
           </mesh>
         </group>
       )}
-      <TargetedSpotlight
-        position={rimLightPos}
-        targetPosition={[0, 0, 5]}
-        angle={0.3}
-        penumbra={0.9}
-        intensity={rimLightIntensity}
-        color="#ffeedd"
-      />
-      {showLightIndicators && (
-        <group position={rimLightPos}>
-          <mesh>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshBasicMaterial color="#ffeedd" />
-          </mesh>
-          <mesh rotation={[0, 0, -Math.PI / 2]} position={[-2, 0, 0]}>
-            <coneGeometry args={[1.2, 4, 16, 1, true]} />
-            <meshBasicMaterial color="#ffeedd" transparent opacity={0.1} side={2} />
-          </mesh>
-        </group>
-      )}
-      <pointLight position={fillLightPos} intensity={fillLightIntensity} color="#ffebd1" />
-      {showLightIndicators && (
-        <group position={fillLightPos}>
-          <mesh>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshBasicMaterial color="#ffebd1" />
-          </mesh>
-          <mesh>
-            <sphereGeometry args={[0.8, 16, 16]} />
-            <meshBasicMaterial color="#ffebd1" wireframe opacity={0.2} transparent />
-          </mesh>
-        </group>
-      )}
-      <pointLight position={frontFillLightPos} intensity={frontFillLightIntensity} color="#ffffff" />
-      {showLightIndicators && (
-        <group position={frontFillLightPos}>
-          <mesh>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
-          <mesh>
-            <sphereGeometry args={[0.8, 16, 16]} />
-            <meshBasicMaterial color="#ffffff" wireframe opacity={0.2} transparent />
-          </mesh>
-        </group>
+      {!perfPreset.isMobile && (
+        <>
+          <TargetedSpotlight
+            position={rimLightPos}
+            targetPosition={[0, 0, 5]}
+            angle={0.3}
+            penumbra={0.9}
+            intensity={rimLightIntensity}
+            color="#ffeedd"
+          />
+          {showLightIndicators && (
+            <group position={rimLightPos}>
+              <mesh>
+                <sphereGeometry args={[0.15, 16, 16]} />
+                <meshBasicMaterial color="#ffeedd" />
+              </mesh>
+              <mesh rotation={[0, 0, -Math.PI / 2]} position={[-2, 0, 0]}>
+                <coneGeometry args={[1.2, 4, 16, 1, true]} />
+                <meshBasicMaterial color="#ffeedd" transparent opacity={0.1} side={2} />
+              </mesh>
+            </group>
+          )}
+          <pointLight position={fillLightPos} intensity={fillLightIntensity} color="#ffebd1" />
+          {showLightIndicators && (
+            <group position={fillLightPos}>
+              <mesh>
+                <sphereGeometry args={[0.15, 16, 16]} />
+                <meshBasicMaterial color="#ffebd1" />
+              </mesh>
+              <mesh>
+                <sphereGeometry args={[0.8, 16, 16]} />
+                <meshBasicMaterial color="#ffebd1" wireframe opacity={0.2} transparent />
+              </mesh>
+            </group>
+          )}
+          <pointLight position={frontFillLightPos} intensity={frontFillLightIntensity} color="#ffffff" />
+          {showLightIndicators && (
+            <group position={frontFillLightPos}>
+              <mesh>
+                <sphereGeometry args={[0.15, 16, 16]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              <mesh>
+                <sphereGeometry args={[0.8, 16, 16]} />
+                <meshBasicMaterial color="#ffffff" wireframe opacity={0.2} transparent />
+              </mesh>
+            </group>
+          )}
+        </>
       )}
       <FlameInteraction
         onCigaretteLit={onCigaretteLit}
         cigarettePosition={cigarettePosition}
+        skipIntro={skipIntro}
       />
       <OrbitControls
         enableZoom={false}

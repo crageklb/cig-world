@@ -9,6 +9,7 @@ interface TargetedSpotlightProps {
   intensity: number;
   color: string;
   castShadow?: boolean;
+  shadowMapSize?: number;
 }
 
 export default function TargetedSpotlight({
@@ -19,6 +20,7 @@ export default function TargetedSpotlight({
   intensity,
   color,
   castShadow = false,
+  shadowMapSize = 2048,
 }: TargetedSpotlightProps) {
   const spotLightRef = useRef<THREE.SpotLight>(null);
 
@@ -38,8 +40,8 @@ export default function TargetedSpotlight({
       intensity={intensity}
       color={color}
       castShadow={castShadow}
-      shadow-mapSize-width={2048}
-      shadow-mapSize-height={2048}
+      shadow-mapSize-width={shadowMapSize}
+      shadow-mapSize-height={shadowMapSize}
     />
   );
 }

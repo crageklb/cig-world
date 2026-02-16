@@ -312,9 +312,9 @@ export default function SmokeEffect({ isLit, position = [0, 0.8, 0] }: SmokeEffe
   // Create geometry - using a solid cone for tight, volumetric smoke
   const geometry = useMemo(() => {
     // ConeGeometry: radius, height, radialSegments, heightSegments
-    // Reduce segments on mobile
-    const radialSegments = perfPreset.isMobile ? 16 : 32;
-    const heightSegments = perfPreset.isMobile ? 32 : 64;
+    // Reduce segments on mobile for performance
+    const radialSegments = perfPreset.isMobile ? 8 : 32;
+    const heightSegments = perfPreset.isMobile ? 16 : 64;
     return new THREE.ConeGeometry(0.02, 2, radialSegments, heightSegments, false);
   }, [perfPreset]);
 
@@ -322,7 +322,7 @@ export default function SmokeEffect({ isLit, position = [0, 0.8, 0] }: SmokeEffe
     if (materialRef.current) {
       // Set octaves if not already set
       if (materialRef.current.uniforms.uOctaves.value === 6 && perfPreset.smokeOctaves !== 6) {
-        materialRef.current.uniforms.uOctaves.value = Math.min(perfPreset.smokeOctaves, 4); // Cap at 4 for cigarette smoke
+        materialRef.current.uniforms.uOctaves.value = Math.min(perfPreset.smokeOctaves, 3); // Cap at 3 on mobile
       }
       
       if (isLit) {
@@ -352,7 +352,7 @@ export default function SmokeEffect({ isLit, position = [0, 0.8, 0] }: SmokeEffe
         depthWrite={false}
         side={THREE.FrontSide}
         blending={THREE.NormalBlending}
-        uOctaves={Math.min(perfPreset.smokeOctaves, 4)}
+        uOctaves={Math.min(perfPreset.smokeOctaves, 3)}
       />
     </mesh>
   );

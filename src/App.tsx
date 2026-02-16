@@ -1,10 +1,21 @@
 import { useState, lazy, Suspense } from 'react';
-import { IconContext, Lightning } from '@phosphor-icons/react';
+import { IconContext, Lightning, ArrowLeft } from '@phosphor-icons/react';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
 function App() {
   const [, setShowDare] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'dare'>('home');
+  const [skipIntro, setSkipIntro] = useState(false);
+
+  const handleDareCardClick = () => {
+    setCurrentPage('dare');
+  };
+
+  const handleBack = () => {
+    setSkipIntro(true);
+    setCurrentPage('home');
+  };
 
   // Cigarette position [x, y, z] - positive y moves up
   const cigarettePosition: [number, number, number] = [0, 0.6, 5];
@@ -31,9 +42,37 @@ function App() {
     }, 1500);
   };
 
+  if (currentPage === 'dare') {
+    return (
+      <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
+        <div className="w-full h-dvh bg-black relative">
+          <button
+            onClick={handleBack}
+            className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-white/90 hover:text-white active:opacity-80 transition-opacity"
+            style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+            aria-label="Back to home"
+          >
+            <ArrowLeft size={24} weight="regular" />
+            <span className="text-base font-medium">Back</span>
+          </button>
+          <h1
+            className="fixed top-0 left-0 right-0 pt-12 pb-4 text-center text-white"
+            style={{
+              fontFamily: "'Manufacturing Consent', sans-serif",
+              fontSize: 'clamp(2rem, 8vw, 4rem)',
+              paddingTop: 'max(3rem, env(safe-area-inset-top) + 2rem)',
+            }}
+          >
+            Dare
+          </h1>
+        </div>
+      </IconContext.Provider>
+    );
+  }
+
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-    <div className="w-full h-dvh relative overflow-hidden">
+    <div className={`w-full h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
       {/* Noise overlay - fixed, visible at all scroll positions */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.15] z-40"
@@ -43,10 +82,8 @@ function App() {
         }}
       />
 
-      {/* Hero section */}
-      <section className="relative h-[70vh] min-h-[32rem] -mt-12">
-      {/* CSS Animated blurry gradient smoke effect - multiple layers */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      {/* CSS smoke blobs - fixed full-page, behind content */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Layer 1 */}
         <div 
           className="absolute"
@@ -55,7 +92,7 @@ function App() {
             left: '15%',
             width: '50%',
             height: '60%',
-            background: 'radial-gradient(ellipse 70% 55% at 40% 45%, rgba(140, 140, 150, 0.85) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse 70% 55% at 40% 45%, rgba(160, 160, 170, 0.9) 0%, transparent 65%)',
             filter: 'blur(80px)',
             animation: 'smokeFloat1 25s ease-in-out infinite',
           }}
@@ -68,7 +105,7 @@ function App() {
             left: '55%',
             width: '45%',
             height: '55%',
-            background: 'radial-gradient(ellipse 60% 80% at 55% 50%, rgba(120, 125, 135, 0.8) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse 60% 80% at 55% 50%, rgba(150, 155, 165, 0.9) 0%, transparent 60%)',
             filter: 'blur(100px)',
             animation: 'smokeFloat2 30s ease-in-out infinite',
           }}
@@ -81,7 +118,7 @@ function App() {
             left: '40%',
             width: '55%',
             height: '50%',
-            background: 'radial-gradient(ellipse 75% 45% at 50% 55%, rgba(130, 135, 145, 0.75) 0%, transparent 55%)',
+            background: 'radial-gradient(ellipse 75% 45% at 50% 55%, rgba(155, 160, 170, 0.9) 0%, transparent 55%)',
             filter: 'blur(90px)',
             animation: 'smokeFloat3 35s ease-in-out infinite',
           }}
@@ -94,7 +131,7 @@ function App() {
             left: '10%',
             width: '40%',
             height: '65%',
-            background: 'radial-gradient(ellipse 50% 70% at 45% 40%, rgba(110, 115, 125, 0.7) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse 50% 70% at 45% 40%, rgba(145, 150, 160, 0.9) 0%, transparent 65%)',
             filter: 'blur(110px)',
             animation: 'smokeFloat4 28s ease-in-out infinite',
           }}
@@ -107,7 +144,7 @@ function App() {
             left: '65%',
             width: '48%',
             height: '52%',
-            background: 'radial-gradient(ellipse 65% 50% at 50% 60%, rgba(125, 130, 140, 0.78) 0%, transparent 58%)',
+            background: 'radial-gradient(ellipse 65% 50% at 50% 60%, rgba(155, 160, 170, 0.9) 0%, transparent 58%)',
             filter: 'blur(95px)',
             animation: 'smokeFloat5 32s ease-in-out infinite',
           }}
@@ -120,7 +157,7 @@ function App() {
             left: '25%',
             width: '52%',
             height: '58%',
-            background: 'radial-gradient(ellipse 55% 75% at 48% 52%, rgba(115, 120, 130, 0.72) 0%, transparent 62%)',
+            background: 'radial-gradient(ellipse 55% 75% at 48% 52%, rgba(150, 155, 165, 0.9) 0%, transparent 62%)',
             filter: 'blur(105px)',
             animation: 'smokeFloat6 27s ease-in-out infinite',
           }}
@@ -133,7 +170,7 @@ function App() {
             left: '5%',
             width: '58%',
             height: '48%',
-            background: 'radial-gradient(ellipse 80% 48% at 42% 58%, rgba(135, 138, 148, 0.82) 0%, transparent 56%)',
+            background: 'radial-gradient(ellipse 80% 48% at 42% 58%, rgba(160, 165, 175, 0.9) 0%, transparent 56%)',
             filter: 'blur(88px)',
             animation: 'smokeFloat7 33s ease-in-out infinite',
           }}
@@ -146,7 +183,7 @@ function App() {
             left: '50%',
             width: '46%',
             height: '62%',
-            background: 'radial-gradient(ellipse 58% 68% at 52% 46%, rgba(108, 112, 122, 0.68) 0%, transparent 64%)',
+            background: 'radial-gradient(ellipse 58% 68% at 52% 46%, rgba(145, 150, 160, 0.9) 0%, transparent 64%)',
             filter: 'blur(98px)',
             animation: 'smokeFloat8 29s ease-in-out infinite',
           }}
@@ -159,7 +196,7 @@ function App() {
             left: '70%',
             width: '42%',
             height: '56%',
-            background: 'radial-gradient(ellipse 62% 52% at 55% 48%, rgba(118, 122, 132, 0.76) 0%, transparent 59%)',
+            background: 'radial-gradient(ellipse 62% 52% at 55% 48%, rgba(155, 160, 170, 0.9) 0%, transparent 59%)',
             filter: 'blur(92px)',
             animation: 'smokeFloat1 31s ease-in-out infinite reverse',
           }}
@@ -172,16 +209,18 @@ function App() {
             left: '0%',
             width: '50%',
             height: '70%',
-            background: 'radial-gradient(ellipse 68% 58% at 38% 54%, rgba(128, 132, 142, 0.8) 0%, transparent 61%)',
+            background: 'radial-gradient(ellipse 68% 58% at 38% 54%, rgba(160, 165, 175, 0.9) 0%, transparent 61%)',
             filter: 'blur(102px)',
             animation: 'smokeFloat2 26s ease-in-out infinite reverse',
           }}
         />
       </div>
-      
+
+      {/* Hero section */}
+      <section className="relative h-[70vh] min-h-[32rem] -mt-12">
       {/* Cigarette, title and subtitle - grouped with fixed heights so position is viewport-stable */}
       <div
-        className="absolute inset-x-0 flex flex-col items-center pointer-events-none z-5 px-5"
+        className="absolute inset-x-0 flex flex-col items-center pointer-events-none z-5"
         style={{ top: 'max(0.2rem, env(safe-area-inset-top))' }}
       >
         {/* Fixed-height cigarette canvas - lazy-loaded, does not block initial render */}
@@ -190,6 +229,7 @@ function App() {
             <CigaretteScene
               onCigaretteLit={handleCigaretteLit}
               cigarettePosition={cigarettePosition}
+              skipIntro={skipIntro}
               mainSpotlightPos={mainSpotlightPos}
               rimLightPos={rimLightPos}
               fillLightPos={fillLightPos}
@@ -220,8 +260,8 @@ function App() {
             <div>Cig</div>
             <div>World</div>
           </div>
-          <div className="subtitle-intro w-full px-12">
-            <p className="text-white/70 text-xl md:text-base text-center tracking-tight">
+          <div className="subtitle-intro w-full px-4 mt-2">
+            <p className="text-white/50 text-lg md:text-base text-center tracking-tight">
               An experience inspired by Giuseppe Corrado Calvo
             </p>
           </div>
@@ -234,28 +274,29 @@ function App() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 px-6 py-4 flex flex-row items-end justify-center gap-0 cards-slide-up"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom) + 0.5rem)' }}
       >
-        <a
-          href="#"
-          className="card-dare flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl bg-[#242424] border border-white/10 text-white text-lg
-            hover:bg-[#2d2d2d] active:bg-[#3e3e3e] shadow-lg transition-colors min-w-0"
+        <button
+          type="button"
+          onClick={handleDareCardClick}
+          className="card-dare card-press card-bg flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg
+            bg-[#242424] shadow-xl transition-colors min-w-0 bg-cover bg-center"
         >
           <span>Dare</span>
           <img
             src="/Subject%203.png"
             alt=""
-            className="w-36 h-auto object-contain [filter:drop-shadow(0.5px_0_0_white)_drop-shadow(-0.5px_0_0_white)_drop-shadow(0_0.5px_0_white)_drop-shadow(0_-0.5px_0_white)_drop-shadow(0.5px_0.5px_0_white)_drop-shadow(-0.5px_-0.5px_0_white)_drop-shadow(0.5px_-0.5px_0_white)_drop-shadow(-0.5px_0.5px_0_white)]"
+            className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_white)_drop-shadow(-0.5px_0_0_white)_drop-shadow(0_0.5px_0_white)_drop-shadow(0_-0.5px_0_white)_drop-shadow(0.5px_0.5px_0_white)_drop-shadow(-0.5px_-0.5px_0_white)_drop-shadow(0.5px_-0.5px_0_white)_drop-shadow(-0.5px_0.5px_0_white)]"
           />
-        </a>
+        </button>
         <a
           href="#"
-          className="card-smoke flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl bg-[#242424] border border-white/10 text-white text-lg
-            hover:bg-[#2d2d2d] active:bg-[#3e3e3e] shadow-lg transition-colors min-w-0 z-10"
+          className="card-smoke card-press card-bg flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg
+            bg-[#242424] shadow-xl transition-colors min-w-0 z-10 bg-cover bg-center"
         >
           <span>Smoke</span>
           <img
             src="/cig-subject.png"
             alt=""
-            className="w-36 h-auto object-contain [filter:drop-shadow(0.375px_0_0_white)_drop-shadow(-0.375px_0_0_white)_drop-shadow(0_0.375px_0_white)_drop-shadow(0_-0.375px_0_white)_drop-shadow(0.375px_0.375px_0_white)_drop-shadow(-0.375px_-0.375px_0_white)_drop-shadow(0.375px_-0.375px_0_white)_drop-shadow(-0.375px_0.375px_0_white)]"
+            className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_white)_drop-shadow(-0.375px_0_0_white)_drop-shadow(0_0.375px_0_white)_drop-shadow(0_-0.375px_0_white)_drop-shadow(0.375px_0.375px_0_white)_drop-shadow(-0.375px_-0.375px_0_white)_drop-shadow(0.375px_-0.375px_0_white)_drop-shadow(-0.375px_0.375px_0_white)]"
           />
         </a>
       </div>

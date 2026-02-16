@@ -16,12 +16,18 @@ export const isMobileDevice = (): boolean => {
 // Performance preset based on device
 export const getPerformancePreset = () => {
   const isMobile = isMobileDevice();
-  
+  // Conservative check for low-end devices (few CPU cores or low memory)
+  const deviceMemory = (navigator as { deviceMemory?: number }).deviceMemory;
+  const isLowEnd =
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+    (deviceMemory !== undefined && deviceMemory <= 4);
+  const useLowEndPreset = isMobile && isLowEnd;
+
   return {
     isMobile,
-    smokeOctaves: isMobile ? 3 : 7,
+    smokeOctaves: useLowEndPreset ? 2 : isMobile ? 3 : 7,
     smokeGeometrySegments: isMobile ? 64 : 128,
-    particleCount: isMobile ? 200 : 500,
+    particleCount: useLowEndPreset ? 50 : isMobile ? 100 : 500,
     enableShadows: !isMobile,
   };
 };
