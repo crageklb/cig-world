@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
-import { IconContext, Lightning, ArrowLeft } from '@phosphor-icons/react';
+import { IconContext, ArrowLeft } from '@phosphor-icons/react';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
@@ -269,16 +269,16 @@ function App() {
       </div>
       </section>
 
-      {/* Mobile: fixed buttons peeking from bottom */}
+      {/* Fixed cards peeking from bottom */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 px-6 py-4 flex flex-row items-end justify-center gap-0 cards-slide-up"
+        className="fixed bottom-0 left-0 right-0 z-50 px-6 py-4 flex flex-row items-end justify-center gap-0 cards-slide-up"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom) + 0.5rem)' }}
       >
         <button
           type="button"
           onClick={handleDareCardClick}
-          className="card-dare card-press card-bg flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg
-            bg-[#242424] shadow-xl transition-colors min-w-0 bg-cover bg-center"
+          className="card-dare card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
+            bg-[#242424] shadow-xl transition-colors bg-cover bg-center"
         >
           <span>Dare</span>
           <img
@@ -289,8 +289,8 @@ function App() {
         </button>
         <a
           href="#"
-          className="card-smoke card-press card-bg flex-1 max-w-[48%] flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg
-            bg-[#242424] shadow-xl transition-colors min-w-0 z-10 bg-cover bg-center"
+          className="card-smoke card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
+            bg-[#242424] shadow-xl transition-colors z-10 bg-cover bg-center"
         >
           <span>Smoke</span>
           <img
@@ -300,21 +300,6 @@ function App() {
           />
         </a>
       </div>
-
-      {/* Desktop: fixed nav on left */}
-      <nav
-        className="hidden md:flex fixed z-50 flex-col h-fit gap-4 top-1/2 -translate-y-1/2 left-0 ml-4 px-3 py-6
-          bg-white/5 backdrop-blur-0 rounded-xl pointer-events-auto"
-      >
-        <a
-          href="#"
-          className="nav-item flex flex-row items-center justify-start gap-2 px-5 py-2.5 rounded-lg text-white font-medium text-base
-            hover:bg-white/20 active:bg-white/25 bg-white/10 border border-white/20 transition-colors"
-        >
-          <Lightning size={20} weight="light" className="shrink-0" />
-          <span>Dare</span>
-        </a>
-      </nav>
 
       {/* Dare display - hidden for now */}
       {/* <DareDisplay visible={showDare} /> */}
