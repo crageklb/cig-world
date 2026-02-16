@@ -23,7 +23,7 @@ body {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   overflow: hidden;
-  background-color: #000000;
+  background: transparent;
   font-family: 'Space Mono', monospace;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -35,7 +35,17 @@ body {
   height: 100%;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
-  background-color: #000000;
+  background: transparent;
+}
+
+/* Noise overlay - small tiles for fine film grain; smaller on mobile for density */
+.noise-overlay {
+  background-size: 120px 120px;
+}
+@media (max-width: 768px) {
+  .noise-overlay {
+    background-size: 60px 60px;
+  }
 }
 
 /* Smoke layer blur - reduced on mobile for performance */
