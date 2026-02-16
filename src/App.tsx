@@ -55,7 +55,7 @@ function App() {
   if (currentPage === 'dare') {
     return (
       <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-        <div className="w-full h-dvh bg-black relative">
+        <div className="w-full min-h-dvh h-dvh bg-black relative">
           <button
             onClick={handleBack}
             className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-white/90 hover:text-white active:opacity-80 transition-opacity"
@@ -82,7 +82,7 @@ function App() {
 
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-    <div className={`w-full h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
+    <div className={`w-full min-h-dvh h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
       {/* Noise overlay - fixed, visible at all scroll positions */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.15] z-40"
