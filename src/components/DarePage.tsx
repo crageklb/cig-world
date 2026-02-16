@@ -273,7 +273,7 @@ export default function DarePage({ onBack }: DarePageProps) {
             className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
           >
             <Cigarette size={20} weight="bold" />
-            HELL YEAH BROTHER
+            HELL YEAH
           </button>
           <button
             type="button"
