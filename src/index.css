@@ -301,6 +301,28 @@ body {
   }
 }
 
+@-webkit-keyframes dareSpin {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes dareSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-dare-spin {
+  -webkit-animation: dareSpin 2s linear infinite;
+  animation: dareSpin 2s linear infinite;
+}
+
 /* Exaggerated ease-out: strong deceleration at end */
 :root {
   --ease-out-exaggerated: cubic-bezier(0.16, 1, 0.3, 1);

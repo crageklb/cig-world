@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { IconContext, ArrowLeft } from '@phosphor-icons/react';
+import { IconContext } from '@phosphor-icons/react';
+import DarePage from './components/DarePage';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
@@ -55,27 +56,7 @@ function App() {
   if (currentPage === 'dare') {
     return (
       <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-        <div className="w-full min-h-dvh h-dvh bg-black relative">
-          <button
-            onClick={handleBack}
-            className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-white/90 hover:text-white active:opacity-80 transition-opacity"
-            style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
-            aria-label="Back to home"
-          >
-            <ArrowLeft size={24} weight="regular" />
-            <span className="text-base font-medium">Back</span>
-          </button>
-          <h1
-            className="fixed top-0 left-0 right-0 pt-12 pb-4 text-center text-white"
-            style={{
-              fontFamily: "'Manufacturing Consent', sans-serif",
-              fontSize: 'clamp(2rem, 8vw, 4rem)',
-              paddingTop: 'max(3rem, env(safe-area-inset-top) + 2rem)',
-            }}
-          >
-            Dare
-          </h1>
-        </div>
+        <DarePage onBack={handleBack} />
       </IconContext.Provider>
     );
   }
