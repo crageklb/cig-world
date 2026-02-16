@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { IconContext } from '@phosphor-icons/react';
 import DarePage from './components/DarePage';
+import SmokePage from './components/SmokePage';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
@@ -16,11 +17,15 @@ function App() {
     }
   }, []);
 
-  const [currentPage, setCurrentPage] = useState<'home' | 'dare'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'dare' | 'smoke'>('home');
   const [skipIntro, setSkipIntro] = useState(false);
 
   const handleDareCardClick = () => {
     setCurrentPage('dare');
+  };
+
+  const handleSmokeCardClick = () => {
+    setCurrentPage('smoke');
   };
 
   const handleBack = () => {
@@ -57,6 +62,14 @@ function App() {
     return (
       <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
         <DarePage onBack={handleBack} />
+      </IconContext.Provider>
+    );
+  }
+
+  if (currentPage === 'smoke') {
+    return (
+      <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
+        <SmokePage onBack={handleBack} />
       </IconContext.Provider>
     );
   }
@@ -280,8 +293,9 @@ function App() {
             className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_white)_drop-shadow(-0.5px_0_0_white)_drop-shadow(0_0.5px_0_white)_drop-shadow(0_-0.5px_0_white)_drop-shadow(0.5px_0.5px_0_white)_drop-shadow(-0.5px_-0.5px_0_white)_drop-shadow(0.5px_-0.5px_0_white)_drop-shadow(-0.5px_0.5px_0_white)]"
           />
         </button>
-        <a
-          href="#"
+        <button
+          type="button"
+          onClick={handleSmokeCardClick}
           className="card-smoke card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
             bg-[#242424] shadow-xl transition-colors z-10 bg-cover bg-center touch-manipulation"
         >
@@ -293,7 +307,7 @@ function App() {
             fetchPriority="low"
             className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_white)_drop-shadow(-0.375px_0_0_white)_drop-shadow(0_0.375px_0_white)_drop-shadow(0_-0.375px_0_white)_drop-shadow(0.375px_0.375px_0_white)_drop-shadow(-0.375px_-0.375px_0_white)_drop-shadow(0.375px_-0.375px_0_white)_drop-shadow(-0.375px_0.375px_0_white)]"
           />
-        </a>
+        </button>
       </div>
 
       {/* Dare display - hidden for now */}

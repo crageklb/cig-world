@@ -378,6 +378,65 @@ body {
   animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@-webkit-keyframes cigShootUp {
+  0% {
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translate(-50%, -50%) translateY(-80vh) scale(0.6);
+    opacity: 0;
+  }
+}
+@keyframes cigShootUp {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-80vh) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.cig-shot {
+  -webkit-animation: cigShootUp 1.2s ease-out forwards;
+  animation: cigShootUp 1.2s ease-out forwards;
+}
+
+/* SUPER CIG text - shake then explode */
+@-webkit-keyframes superCigShake {
+  0%, 15%, 30%, 45%, 60%, 75% { -webkit-transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+  7%, 22%, 37%, 52%, 67%, 82% { -webkit-transform: translate(-50%, -50%) scale(1) translateX(-8px) rotate(2deg); }
+  14%, 29%, 44%, 59%, 74%, 90% { -webkit-transform: translate(-50%, -50%) scale(1) translateX(8px) rotate(-2deg); }
+  92% { -webkit-transform: translate(-50%, -50%) scale(1); }
+  100% { -webkit-transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+@keyframes superCigShake {
+  0%, 15%, 30%, 45%, 60%, 75% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+  7%, 22%, 37%, 52%, 67%, 82% { transform: translate(-50%, -50%) scale(1) translateX(-8px) rotate(2deg); }
+  14%, 29%, 44%, 59%, 74%, 90% { transform: translate(-50%, -50%) scale(1) translateX(8px) rotate(-2deg); }
+  92% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+.super-cig-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-animation: superCigShake 2s ease-out forwards;
+  animation: superCigShake 2s ease-out forwards;
+  text-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+/* Piss droplet image - centered on position */
+.droplet-img {
+  width: 32px;
+  height: auto;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .badge-wiggle {
     -webkit-animation: none;
@@ -388,6 +447,14 @@ body {
     animation: none;
     -webkit-transform: translateY(50%);
     transform: translateY(50%);
+  }
+  .cig-shot {
+    -webkit-animation: none;
+    animation: none;
+  }
+  .super-cig-text {
+    -webkit-animation: none;
+    animation: none;
   }
 }
 
