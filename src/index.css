@@ -31,6 +31,8 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Remove 300ms tap delay on mobile for faster touch response */
+  touch-action: manipulation;
 }
 
 #root {

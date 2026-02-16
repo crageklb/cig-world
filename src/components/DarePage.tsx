@@ -96,10 +96,10 @@ export default function DarePage({ onBack }: DarePageProps) {
 
   return (
     <div className="w-full min-h-dvh h-dvh bg-gray-50 relative flex flex-col">
-      {phase !== 'punishmentRevealed' && (
+      {phase === 'revealed' && (
         <button
           onClick={onBack}
-          className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-[#1B1B1B] hover:opacity-80 active:opacity-70 transition-opacity"
+          className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-[#1B1B1B] hover:opacity-80 active:opacity-70 transition-opacity touch-manipulation"
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
           aria-label="Back to home"
         >
@@ -178,14 +178,14 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={onBack}
-            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
+            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
           >
             HOME
           </button>
           <button
             type="button"
             onClick={handleNewDare}
-            className="px-8 py-3 rounded-lg bg-[#1b1b1b] text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity"
+            className="px-8 py-3 rounded-lg bg-[#1b1b1b] text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity touch-manipulation"
           >
             NEW DARE
           </button>
@@ -233,14 +233,14 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleAccept}
-            className="px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
+            className="px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
           >
             Accept
           </button>
           <button
             type="button"
             onClick={handleSkip}
-            className="flex items-center justify-center gap-2 px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all"
+            className="flex items-center justify-center gap-2 px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
           >
             <ArrowArcRight size={18} weight="bold" />
             Skip
@@ -270,7 +270,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleAccept}
-            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
           >
             <Cigarette size={20} weight="bold" />
             HELL YEAH
@@ -278,7 +278,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleSkip}
-            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
           >
             <ArrowArcRight size={20} weight="bold" />
             NOPE
@@ -297,14 +297,14 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 min-w-0 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all"
+            className="flex-1 min-w-0 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
           >
             HOME
           </button>
           <button
             type="button"
             onClick={handleNewDare}
-            className="flex-1 min-w-0 py-4 rounded-xl bg-[#1b1b1b] shadow-sm text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity"
+            className="flex-1 min-w-0 py-4 rounded-xl bg-[#1b1b1b] shadow-sm text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity touch-manipulation"
           >
             NEW DARE
           </button>
