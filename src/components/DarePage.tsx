@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowArcRight, ArrowLeft, Cigarette } from '@phosphor-icons/react';
+import { ArrowArcRight, ArrowLeft, CircleNotch, Cigarette } from '@phosphor-icons/react';
 
 const DARES = [
   "Do 20 push-ups while someone holds a beer on your back!",
@@ -49,6 +49,15 @@ export default function DarePage({ onBack }: DarePageProps) {
   const [currentPunishment, setCurrentPunishment] = useState('');
   const [skipsRemaining, setSkipsRemaining] = useState(SKIPS_INITIAL);
   const [showNoSkipsMessage, setShowNoSkipsMessage] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handleBackClick = () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => onBack());
+    });
+  };
 
   useEffect(() => {
     if (phase !== 'spinning') return;
@@ -98,13 +107,19 @@ export default function DarePage({ onBack }: DarePageProps) {
     <div className="w-full min-h-dvh h-dvh bg-gray-50 relative flex flex-col">
       {phase === 'revealed' && (
         <button
-          onClick={onBack}
-          className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-[#1B1B1B] hover:opacity-80 active:opacity-70 transition-opacity touch-manipulation"
+          onClick={handleBackClick}
+          disabled={isNavigating}
+          className="fixed top-0 left-0 z-50 p-4 flex items-center gap-2 text-[#1B1B1B] hover:opacity-80 active:opacity-70 transition-opacity touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
           aria-label="Back to home"
+          aria-busy={isNavigating}
         >
-          <ArrowLeft size={24} weight="regular" />
-          <span className="text-base font-medium">Big back</span>
+          {isNavigating ? (
+            <CircleNotch size={24} weight="bold" className="animate-spin" />
+          ) : (
+            <ArrowLeft size={24} weight="regular" />
+          )}
+          <span className="text-base font-medium">{isNavigating ? 'Loading…' : 'Big back'}</span>
         </button>
       )}
 
@@ -177,10 +192,18 @@ export default function DarePage({ onBack }: DarePageProps) {
         <div className="hidden md:flex flex-row gap-4">
           <button
             type="button"
-            onClick={onBack}
-            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
+            onClick={handleBackClick}
+            disabled={isNavigating}
+            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
           >
-            HOME
+            {isNavigating ? (
+              <>
+                <CircleNotch size={18} weight="bold" className="animate-spin" />
+                Loading…
+              </>
+            ) : (
+              'HOME'
+            )}
           </button>
           <button
             type="button"
@@ -296,10 +319,18 @@ export default function DarePage({ onBack }: DarePageProps) {
         <div className="flex flex-row gap-3">
           <button
             type="button"
-            onClick={onBack}
-            className="flex-1 min-w-0 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
+            onClick={handleBackClick}
+            disabled={isNavigating}
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
           >
-            HOME
+            {isNavigating ? (
+              <>
+                <CircleNotch size={20} weight="bold" className="animate-spin" />
+                Loading…
+              </>
+            ) : (
+              'HOME'
+            )}
           </button>
           <button
             type="button"
