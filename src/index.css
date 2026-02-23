@@ -435,6 +435,13 @@ body {
   height: auto;
   object-fit: contain;
   transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+.cig-shot-js,
+.bazooka-rocket {
+  will-change: transform;
+  contain: layout style;
 }
 
 /* Piss droplet image - centered on position */
@@ -443,6 +450,8 @@ body {
   height: auto;
   object-fit: contain;
   transform: translate(-50%, -50%);
+  will-change: transform;
+  contain: layout style;
 }
 
 /* Droplet hit splash - SVG starburst with smooth water-explosion motion */
@@ -543,6 +552,8 @@ body {
   object-fit: contain;
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  will-change: transform;
+  contain: layout style;
 }
 
 /* ===== BAZOOKA JOE MODE ===== */

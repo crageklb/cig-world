@@ -45,8 +45,8 @@ const SPECIAL_TARGET_IMAGES = [
 ];
 
 const LIVES_INITIAL = 3;
-const HOLD_INTERVAL_MS = 220;
-const HOLD_INTERVAL_SUPER_MS = 30;
+const HOLD_INTERVAL_MS = 320;
+const HOLD_INTERVAL_SUPER_MS = 80;
 const HOLD_INTERVAL_BAZOOKA_MS = 100;
 const HOLD_DELAY_MS = 120;
 const SUPER_CIG_DURATION_MS = 10000;
@@ -60,7 +60,10 @@ const DROPLET_SPAWN_INTERVAL_BASE_MS = 1400;
 const DROPLET_SPAWN_INTERVAL_MIN_MS = 280;
 const DROPLET_SPAWN_JITTER_MS = 400;
 const COLLISION_RADIUS = 6;
+const CIG_TIP_OFFSET_Y = -3;
 const CIG_LIFETIME_MS = 3500;
+const MAX_CIGS_ON_SCREEN = 40;
+const MAX_SPLASHES_ON_SCREEN = 8;
 const SPLASH_DURATION_MS = 520;
 const SPECIAL_TARGET_POINTS = 100;
 const SPECIAL_TARGET_COLLISION_RADIUS = 12;
@@ -75,14 +78,11 @@ const BAZOOKA_TARGET_SPAWN_MAX_MS = 60000;
 const BAZOOKA_DURATION_MS = 20000;
 const WHITE_DROPLET_SPAWN_INTERVAL_MS = 600;
 
-// Tendril configs: angle (deg), length (viewBox units), stroke width. All radiate outward from center.
+// Tendril configs: angle (deg), length (viewBox units), stroke width. 12 tendrils for perf.
 const SPLASH_TENDRILS: Array<[number, number, number]> = [
-  [7, 34, 4], [31, 28, 3], [55, 38, 5], [79, 26, 2],
-  [103, 36, 4], [127, 30, 3], [151, 40, 6], [175, 28, 2],
-  [199, 35, 4], [223, 32, 3], [247, 30, 5], [271, 36, 3],
-  [295, 26, 2], [319, 32, 4], [343, 31, 3], [14, 39, 5],
-  [67, 28, 2], [91, 34, 4], [118, 37, 6], [142, 27, 3],
-  [166, 35, 4], [190, 33, 3], [214, 38, 5], [238, 29, 2],
+  [0, 36, 4], [30, 30, 3], [60, 38, 5], [90, 28, 3],
+  [120, 35, 4], [150, 32, 5], [180, 38, 4], [210, 30, 3],
+  [240, 34, 5], [270, 32, 3], [300, 36, 4], [330, 30, 3],
 ];
 
 export default function SmokePage({ onBack }: { onBack: () => void }) {
@@ -156,6 +156,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   const spawnCig = useCallback(
     (clientX: number, clientY: number, lockedToBottom = false) => {
       if (gameOverRef.current) return;
+      if (cigsRef.current.length >= MAX_CIGS_ON_SCREEN) return;
       const container = containerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
@@ -448,10 +449,11 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const hitBazookaTargetIds = new Set<number>();
 
       for (const cig of updatedCigs) {
+        const cigTipY = cig.y + CIG_TIP_OFFSET_Y;
         for (const drop of stillOnScreen) {
           const dx = cig.x - drop.x;
-          const dy = cig.y - drop.y;
-          if (Math.sqrt(dx * dx + dy * dy) < COLLISION_RADIUS) {
+          const dy = cigTipY - drop.y;
+          if (dx * dx + dy * dy < COLLISION_RADIUS * COLLISION_RADIUS) {
             hitCigIds.add(cig.id);
             hitDropletIds.add(drop.id);
           }
@@ -459,8 +461,8 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         for (const target of updatedSpecialTargets) {
           if (target.y < 0 || target.y > 100) continue;
           const dx = cig.x - target.x;
-          const dy = cig.y - target.y;
-          if (Math.sqrt(dx * dx + dy * dy) < SPECIAL_TARGET_COLLISION_RADIUS) {
+          const dy = cigTipY - target.y;
+          if (dx * dx + dy * dy < SPECIAL_TARGET_COLLISION_RADIUS * SPECIAL_TARGET_COLLISION_RADIUS) {
             hitCigIds.add(cig.id);
             hitSpecialTargetIds.add(target.id);
             hitSpecialTargetPositions.push({ x: target.x, y: target.y });
@@ -469,8 +471,8 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         for (const bt of updatedBazookaTargets) {
           if (bt.y < 0 || bt.y > 100) continue;
           const dx = cig.x - bt.x;
-          const dy = cig.y - bt.y;
-          if (Math.sqrt(dx * dx + dy * dy) < BAZOOKA_TARGET_COLLISION_RADIUS) {
+          const dy = cigTipY - bt.y;
+          if (dx * dx + dy * dy < BAZOOKA_TARGET_COLLISION_RADIUS * BAZOOKA_TARGET_COLLISION_RADIUS) {
             hitCigIds.add(cig.id);
             hitBazookaTargetIds.add(bt.id);
           }
@@ -499,7 +501,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         }
         setDropletPoints((p) => p + hitDropletIds.size);
         setPoints((p) => p + hitDropletIds.size);
-        // Spawn splashes at hit droplet positions
+        // Spawn splashes at hit droplet positions (capped for performance)
         const newSplashes: Splash[] = stillOnScreen
           .filter((d) => hitDropletIds.has(d.id))
           .map((d) => ({
@@ -508,7 +510,10 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
             y: d.y,
             spawnTime: now,
           }));
-        splashesRef.current = [...splashesRef.current, ...newSplashes];
+        const combined = [...splashesRef.current, ...newSplashes];
+        splashesRef.current = combined.length > MAX_SPLASHES_ON_SCREEN
+          ? combined.slice(-MAX_SPLASHES_ON_SCREEN)
+          : combined;
         setSplashes(splashesRef.current);
       }
 
@@ -576,6 +581,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       dropletsRef.current = finalDroplets;
       specialTargetsRef.current = finalSpecialTargets;
       bazookaTargetsRef.current = finalBazookaTargets;
+
       setCigs(finalCigs);
       setDroplets(finalDroplets);
       setSpecialTargets(finalSpecialTargets);
