@@ -429,6 +429,14 @@ body {
   text-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
+/* Cigarette bullet projectile */
+.cig-bullet-img {
+  width: 18px;
+  height: auto;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+}
+
 /* Piss droplet image - centered on position */
 .droplet-img {
   width: 32px;
@@ -437,7 +445,352 @@ body {
   transform: translate(-50%, -50%);
 }
 
+/* Droplet hit splash - SVG starburst with smooth water-explosion motion */
+@keyframes dropletSplash {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes splashTendril {
+  0% {
+    stroke-dashoffset: var(--tendril-length);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes splashDrop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  25% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.droplet-splash {
+  width: 100px;
+  height: 100px;
+  -webkit-animation: dropletSplash 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation: dropletSplash 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
+.droplet-splash-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.droplet-splash-core {
+  -webkit-animation: splashDrop 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation: splashDrop 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+.droplet-splash-tendril {
+  stroke-dasharray: var(--tendril-length);
+  stroke-dashoffset: var(--tendril-length);
+  -webkit-animation: splashTendril 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--tendril-delay) forwards;
+  animation: splashTendril 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--tendril-delay) forwards;
+}
+
+.droplet-splash-drop {
+  opacity: 0;
+  transform-origin: center;
+  -webkit-animation: splashDrop 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--tendril-delay) forwards;
+  animation: splashDrop 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--tendril-delay) forwards;
+}
+
+/* Red splash variant - slightly larger for special target hit */
+.droplet-splash--red {
+  width: 130px;
+  height: 130px;
+}
+
+/* Special falling target (100 pts, red splash) */
+.special-target-img {
+  width: 64px;
+  height: auto;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* ===== BAZOOKA JOE MODE ===== */
+
+/* Bazooka target - rare falling cig-subject with sparkle glow */
+@keyframes bazookaGlow {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 8px rgba(255,180,50,0.9))
+      drop-shadow(0 0 20px rgba(255,140,30,0.6))
+      drop-shadow(0 0 40px rgba(255,100,0,0.3));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 12px rgba(255,220,100,1))
+      drop-shadow(0 0 28px rgba(255,160,50,0.8))
+      drop-shadow(0 0 50px rgba(255,120,0,0.4));
+  }
+}
+
+@keyframes bazookaSparkle {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.bazooka-target {
+  transform: translate(-50%, -50%);
+}
+
+.bazooka-target-img {
+  width: 72px;
+  height: auto;
+  object-fit: contain;
+  animation: bazookaGlow 1.2s ease-in-out infinite;
+}
+
+.bazooka-target::before,
+.bazooka-target::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: bazookaSparkle 0.8s ease-in-out infinite;
+}
+
+.bazooka-target::before {
+  width: 6px; height: 6px;
+  top: 10%; left: 15%;
+  animation-delay: 0s;
+}
+
+.bazooka-target::after {
+  width: 4px; height: 4px;
+  top: 25%; right: 10%;
+  animation-delay: 0.4s;
+}
+
+/* Default game background - tropical beach image */
+.game-bg-tropical {
+  background: url('/game-bg-tropical.png') center / cover no-repeat;
+}
+
+/* White droplet variant during bazooka mode */
+.droplet-img--white {
+  filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
+/* Space battle background */
+.bazooka-bg {
+  background:
+    radial-gradient(ellipse at 20% 40%, rgba(40,0,80,0.5) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 60%, rgba(80,0,40,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 20%, rgba(0,20,60,0.3) 0%, transparent 70%),
+    linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 30%, #0d0d2b 60%, #0a0a1a 100%);
+}
+
+/* Demonic face background - fades in over 20s */
+@keyframes bazookaFaceIn {
+  0% { opacity: 0; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes bazookaEyeGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 15px 6px rgba(255,0,0,0.7),
+      0 0 40px 12px rgba(255,0,0,0.4),
+      0 0 80px 20px rgba(200,0,0,0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px 8px rgba(255,20,20,0.9),
+      0 0 50px 16px rgba(255,0,0,0.5),
+      0 0 100px 28px rgba(200,0,0,0.3);
+  }
+}
+
+.bazooka-face-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bazooka-face-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  animation: bazookaFaceIn 20s ease-in forwards;
+  filter: saturate(0.3) contrast(1.3) brightness(0.6);
+}
+
+.bazooka-face-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(80, 0, 0, 0.5) 0%,
+    rgba(40, 0, 20, 0.4) 40%,
+    rgba(60, 0, 0, 0.6) 100%
+  );
+  mix-blend-mode: multiply;
+  animation: bazookaFaceIn 20s ease-in forwards;
+}
+
+/* Screen shake */
+@keyframes bazookaShake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1px, 1px); }
+  20% { transform: translate(1px, -1px); }
+  30% { transform: translate(-1px, 0px); }
+  40% { transform: translate(1px, 1px); }
+  50% { transform: translate(0px, -1px); }
+  60% { transform: translate(-1px, 1px); }
+  70% { transform: translate(1px, 0px); }
+  80% { transform: translate(0px, -1px); }
+  90% { transform: translate(-1px, -1px); }
+}
+
+.bazooka-shake {
+  animation: bazookaShake 0.15s infinite;
+}
+
+/* BAZOOKA JOE MODE text */
+@keyframes bazookaTextEntry {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+  40% { transform: translate(-50%, -50%) scale(1.3) rotate(3deg); opacity: 1; }
+  60% { transform: translate(-50%, -50%) scale(0.95) rotate(-1deg); opacity: 1; }
+  75% { transform: translate(-50%, -50%) scale(1.05) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(4) rotate(0deg); opacity: 0; }
+}
+
+.bazooka-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  animation: bazookaTextEntry 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  text-shadow:
+    0 0 20px rgba(255,120,0,0.8),
+    0 0 40px rgba(255,80,0,0.4),
+    0 2px 0 rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+/* Rocket projectile (Subject 3 in bazooka mode) */
+.bazooka-rocket {
+  z-index: 10;
+}
+
+.rocket-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.rocket-img {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255,160,50,0.5));
+  position: relative;
+  z-index: 2;
+}
+
+/* Flame and smoke trail */
+@keyframes rocketFlame {
+  0%, 100% { height: 24px; opacity: 0.9; }
+  50% { height: 32px; opacity: 1; }
+}
+
+@keyframes rocketSmoke {
+  0% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+  100% { opacity: 0; transform: translateX(-50%) scaleX(2.5) translateY(20px); }
+}
+
+.rocket-trail {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 28px;
+  border-radius: 0 0 50% 50%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.9) 0%,
+    rgba(255,220,100,1) 20%,
+    rgba(255,140,30,0.95) 50%,
+    rgba(255,80,0,0.7) 75%,
+    transparent 100%
+  );
+  animation: rocketFlame 0.12s ease-in-out infinite;
+  z-index: 1;
+}
+
+.rocket-trail::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(180,180,180,0.5) 0%,
+    rgba(150,150,150,0.2) 50%,
+    transparent 100%
+  );
+  animation: rocketSmoke 0.4s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .droplet-splash {
+    -webkit-animation: dropletSplash 0.15s ease-out forwards;
+    animation: dropletSplash 0.15s ease-out forwards;
+  }
+  .droplet-splash-tendril {
+    -webkit-animation: splashTendril 0.12s ease-out forwards;
+    animation: splashTendril 0.12s ease-out forwards;
+  }
+  .droplet-splash-drop,
+  .droplet-splash-core {
+    -webkit-animation: splashDrop 0.1s ease-out forwards;
+    animation: splashDrop 0.1s ease-out forwards;
+  }
   .badge-wiggle {
     -webkit-animation: none;
     animation: none;
