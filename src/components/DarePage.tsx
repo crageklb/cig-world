@@ -104,7 +104,7 @@ export default function DarePage({ onBack }: DarePageProps) {
   }, [phase]);
 
   return (
-    <div className="w-full min-h-dvh h-dvh bg-gray-50 relative flex flex-col">
+    <div className="w-full h-dvh bg-gray-50 relative flex flex-col overflow-hidden">
       {phase === 'revealed' && (
         <button
           onClick={handleBackClick}

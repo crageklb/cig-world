@@ -76,7 +76,7 @@ function App() {
 
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-    <div className={`w-full min-h-dvh relative overflow-y-auto overflow-x-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
+    <div className={`w-full h-dvh relative overflow-hidden flex flex-col ${skipIntro ? 'intro-skipped' : ''}`}>
       {/* Top bar - stars across */}
       <header
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1 top-bar-stars"
@@ -225,8 +225,8 @@ function App() {
         />
       </div>
 
-      {/* Hero section */}
-      <section className="relative" style={{ paddingTop: '2.5rem' }}>
+      {/* Hero section - takes its natural size, cards shrink around it */}
+      <section className="relative shrink-0 flex flex-col" style={{ paddingTop: '2.5rem' }}>
         {/* Cigarette canvas - absolutely positioned, no layout impact */}
         <div className="absolute inset-x-0 flex justify-center pointer-events-none" style={{ zIndex: 20, top: '-3rem' }}>
           <div className="relative w-full max-w-xl h-[34rem] pointer-events-auto">
@@ -256,7 +256,7 @@ function App() {
         </div>
 
         {/* Spacer - reserves vertical space for the visible cigarette above the title */}
-        <div className="h-[8rem]" aria-hidden />
+        <div className="flex-[0_0_8rem]" aria-hidden />
 
         {/* Title and subtitle - normal flow, z-index above canvas so clicks pass through */}
         <div
@@ -264,11 +264,12 @@ function App() {
         >
           <div className="title-responsive" style={{ textAlign: 'center', lineHeight: '.7' }}>
             <div className="title-calvo mt-4 mb-6">Cig</div>
-            <div className="title-crush" aria-label="World">
-              {'WORLD'.split('').map((ch, i) => (
-                <span key={i} className="title-crush-ch" style={{ transform: `scaleY(${[1, 0.78, 0.62, 0.78, 1][i]})` }}>{ch}</span>
-              ))}
-            </div>
+            <img
+              src="/WORLD.svg"
+              alt="World"
+              className="w-4/5 h-auto block mx-auto"
+              style={{ marginTop: '0.5rem' }}
+            />
           </div>
           <div className="subtitle-intro flex justify-center gap-2 -my-2">
             {[...Array(3)].map((_, i) => <span key={i} className="star">&#9733;</span>)}
@@ -288,61 +289,45 @@ function App() {
         </div>
       </section>
 
-      {/* Game cards - inline below hero */}
+      {/* Game cards - shrinkable so they never overlap the title */}
       <div
-        className="relative z-10 pt-6 pb-8 flex flex-row items-stretch justify-center gap-4 cards-slide-up"
-        style={{ paddingLeft: '20px', paddingRight: '20px' }}
+        className="relative z-10 min-h-0 pt-4 pb-4 flex flex-row items-stretch justify-center gap-4 cards-slide-up"
+        style={{ paddingLeft: '20px', paddingRight: '20px', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', flex: '0 1 20rem' }}
       >
         <button
           type="button"
           onClick={handleDareCardClick}
-          className="card-dare card-press pack-container flex-1 basis-0 min-w-0 flex flex-col items-center justify-start p-4 min-h-[17.5rem] touch-manipulation"
+          className="card-dare card-press pack-container flex-1 basis-0 min-w-0 min-h-0 flex flex-col items-center justify-start p-4 touch-manipulation"
         >
-          <span className="card-label" style={{ color: '#262262' }}>Dare</span>
-          <div className="flex-1 flex items-center justify-center">
+          <span className="card-label shrink-0" style={{ color: '#262262' }}>Dare</span>
+          <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
             <img
               src="/Subject%203.png"
               alt=""
               loading="lazy"
               fetchPriority="low"
-              className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_#262262)_drop-shadow(-0.5px_0_0_#262262)_drop-shadow(0_0.5px_0_#262262)_drop-shadow(0_-0.5px_0_#262262)]"
+              className="w-28 h-auto max-h-full object-contain [filter:drop-shadow(0.5px_0_0_#262262)_drop-shadow(-0.5px_0_0_#262262)_drop-shadow(0_0.5px_0_#262262)_drop-shadow(0_-0.5px_0_#262262)]"
             />
           </div>
         </button>
         <button
           type="button"
           onClick={handleSmokeCardClick}
-          className="card-smoke card-press pack-container flex-1 basis-0 min-w-0 flex flex-col items-center justify-start p-4 min-h-[17.5rem] touch-manipulation"
+          className="card-smoke card-press pack-container flex-1 basis-0 min-w-0 min-h-0 flex flex-col items-center justify-start p-4 touch-manipulation"
         >
-          <span className="card-label" style={{ color: '#262262' }}>Shoot</span>
-          <div className="flex-1 flex items-center justify-center">
+          <span className="card-label shrink-0" style={{ color: '#262262' }}>Shoot</span>
+          <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
             <img
               src="/cig-subject.png"
               alt=""
               loading="lazy"
               fetchPriority="low"
-              className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_#262262)_drop-shadow(-0.375px_0_0_#262262)_drop-shadow(0_0.375px_0_#262262)_drop-shadow(0_-0.375px_0_#262262)]"
+              className="w-28 h-auto max-h-full object-contain [filter:drop-shadow(0.375px_0_0_#262262)_drop-shadow(-0.375px_0_0_#262262)_drop-shadow(0_0.375px_0_#262262)_drop-shadow(0_-0.375px_0_#262262)]"
             />
           </div>
         </button>
       </div>
 
-      {/* Footer */}
-      <footer className="w-full py-3 text-center">
-        {/* Curves above */}
-        <svg viewBox="0 0 200 24" className="w-full" style={{ display: 'block', marginBottom: '6px', height: '20px' }}>
-          <path d="M 40 6 Q 100 20 160 6" fill="none" stroke="#262262" strokeWidth="2.5" strokeLinecap="round"/>
-          <path d="M 55 1 Q 100 12 145 1" fill="none" stroke="#262262" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-        <p style={{ color: '#262262', fontFamily: "'Druk Wide', sans-serif", fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          Alright, I'll Smoke One
-        </p>
-        {/* Curves below */}
-        <svg viewBox="0 0 200 24" className="w-full" style={{ display: 'block', marginTop: '6px', height: '20px' }}>
-          <path d="M 55 23 Q 100 12 145 23" fill="none" stroke="#262262" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M 40 18 Q 100 4 160 18" fill="none" stroke="#262262" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
-      </footer>
     </div>
     </IconContext.Provider>
   );
