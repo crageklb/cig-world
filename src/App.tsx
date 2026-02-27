@@ -76,14 +76,29 @@ function App() {
 
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-    <div className={`w-full min-h-dvh h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
+    <div className={`w-full h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
+      {/* Top bar - stars across */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1 top-bar-stars"
+        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.25rem' }}
+      >
+        {[...Array(48)].map((_, i) => (
+          <span key={i} className="top-bar-star">&#9733;</span>
+        ))}
+      </header>
+
       {/* Noise overlay - fixed, visible at all scroll positions */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.15] z-40 noise-overlay"
+        className="fixed inset-0 pointer-events-none opacity-[0.15] z-[2] noise-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat',
         }}
+      />
+
+      {/* Halftone dot overlay - vintage print texture */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.35] z-[1] halftone-overlay"
       />
 
       {/* CSS smoke blobs - fixed full-page, behind content */}
@@ -96,7 +111,7 @@ function App() {
             left: '15%',
             width: '50%',
             height: '60%',
-            background: 'radial-gradient(ellipse 70% 55% at 40% 45%, rgba(160, 160, 170, 0.9) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse 70% 55% at 40% 45%, rgba(139, 135, 192, 0.9) 0%, transparent 65%)',
             animation: 'smokeFloat1 25s ease-in-out infinite',
           }}
         />
@@ -108,7 +123,7 @@ function App() {
             left: '55%',
             width: '45%',
             height: '55%',
-            background: 'radial-gradient(ellipse 60% 80% at 55% 50%, rgba(150, 155, 165, 0.9) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse 60% 80% at 55% 50%, rgba(150, 148, 190, 0.9) 0%, transparent 60%)',
             animation: 'smokeFloat2 30s ease-in-out infinite',
           }}
         />
@@ -120,7 +135,7 @@ function App() {
             left: '40%',
             width: '55%',
             height: '50%',
-            background: 'radial-gradient(ellipse 75% 45% at 50% 55%, rgba(155, 160, 170, 0.9) 0%, transparent 55%)',
+            background: 'radial-gradient(ellipse 75% 45% at 50% 55%, rgba(145, 142, 195, 0.9) 0%, transparent 55%)',
             animation: 'smokeFloat3 35s ease-in-out infinite',
           }}
         />
@@ -132,7 +147,7 @@ function App() {
             left: '10%',
             width: '40%',
             height: '65%',
-            background: 'radial-gradient(ellipse 50% 70% at 45% 40%, rgba(145, 150, 160, 0.9) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse 50% 70% at 45% 40%, rgba(130, 128, 185, 0.9) 0%, transparent 65%)',
             animation: 'smokeFloat4 28s ease-in-out infinite',
           }}
         />
@@ -144,7 +159,7 @@ function App() {
             left: '65%',
             width: '48%',
             height: '52%',
-            background: 'radial-gradient(ellipse 65% 50% at 50% 60%, rgba(155, 160, 170, 0.9) 0%, transparent 58%)',
+            background: 'radial-gradient(ellipse 65% 50% at 50% 60%, rgba(148, 145, 195, 0.9) 0%, transparent 58%)',
             animation: 'smokeFloat5 32s ease-in-out infinite',
           }}
         />
@@ -156,7 +171,7 @@ function App() {
             left: '25%',
             width: '52%',
             height: '58%',
-            background: 'radial-gradient(ellipse 55% 75% at 48% 52%, rgba(150, 155, 165, 0.9) 0%, transparent 62%)',
+            background: 'radial-gradient(ellipse 55% 75% at 48% 52%, rgba(142, 140, 188, 0.9) 0%, transparent 62%)',
             animation: 'smokeFloat6 27s ease-in-out infinite',
           }}
         />
@@ -168,7 +183,7 @@ function App() {
             left: '5%',
             width: '58%',
             height: '48%',
-            background: 'radial-gradient(ellipse 80% 48% at 42% 58%, rgba(160, 165, 175, 0.9) 0%, transparent 56%)',
+            background: 'radial-gradient(ellipse 80% 48% at 42% 58%, rgba(155, 152, 200, 0.9) 0%, transparent 56%)',
             animation: 'smokeFloat7 33s ease-in-out infinite',
           }}
         />
@@ -180,7 +195,7 @@ function App() {
             left: '50%',
             width: '46%',
             height: '62%',
-            background: 'radial-gradient(ellipse 58% 68% at 52% 46%, rgba(145, 150, 160, 0.9) 0%, transparent 64%)',
+            background: 'radial-gradient(ellipse 58% 68% at 52% 46%, rgba(135, 132, 185, 0.9) 0%, transparent 64%)',
             animation: 'smokeFloat8 29s ease-in-out infinite',
           }}
         />
@@ -192,7 +207,7 @@ function App() {
             left: '70%',
             width: '42%',
             height: '56%',
-            background: 'radial-gradient(ellipse 62% 52% at 55% 48%, rgba(155, 160, 170, 0.9) 0%, transparent 59%)',
+            background: 'radial-gradient(ellipse 62% 52% at 55% 48%, rgba(148, 145, 195, 0.9) 0%, transparent 59%)',
             animation: 'smokeFloat1 31s ease-in-out infinite reverse',
           }}
         />
@@ -204,114 +219,120 @@ function App() {
             left: '0%',
             width: '50%',
             height: '70%',
-            background: 'radial-gradient(ellipse 68% 58% at 38% 54%, rgba(160, 165, 175, 0.9) 0%, transparent 61%)',
+            background: 'radial-gradient(ellipse 68% 58% at 38% 54%, rgba(155, 152, 200, 0.9) 0%, transparent 61%)',
             animation: 'smokeFloat2 26s ease-in-out infinite reverse',
           }}
         />
       </div>
 
       {/* Hero section */}
-      <section className="relative h-[70vh] min-h-[32rem] -mt-24">
-      {/* Cigarette, title and subtitle - grouped with fixed heights so position is viewport-stable */}
-      <div
-        className="absolute inset-x-0 flex flex-col items-center pointer-events-none z-5"
-        style={{ top: 'max(0.2rem, env(safe-area-inset-top))' }}
-      >
-        {/* Fixed-height cigarette canvas - lazy-loaded, does not block initial render */}
-        <div className="relative w-full max-w-xl h-[40rem] shrink-0 pointer-events-auto">
-          <Suspense
-            fallback={
-              <div
-                className="w-full h-full flex items-center justify-center bg-black/20"
-                aria-hidden
-                aria-busy="true"
-              >
-                <div className="w-24 h-1 rounded-full bg-white/10 animate-pulse" />
-              </div>
-            }
-          >
-            <CigaretteScene
-              onCigaretteLit={handleCigaretteLit}
-              cigarettePosition={cigarettePosition}
-              skipIntro={skipIntro}
-              mainSpotlightPos={mainSpotlightPos}
-              rimLightPos={rimLightPos}
-              fillLightPos={fillLightPos}
-              frontFillLightPos={frontFillLightPos}
-              mainSpotlightIntensity={mainSpotlightIntensity}
-              rimLightIntensity={rimLightIntensity}
-              fillLightIntensity={fillLightIntensity}
-              frontFillLightIntensity={frontFillLightIntensity}
-              showLightIndicators={showLightIndicators}
-            />
-          </Suspense>
+      <section className="relative" style={{ paddingTop: '2.5rem' }}>
+        {/* Cigarette canvas - absolutely positioned, no layout impact */}
+        <div className="absolute inset-x-0 flex justify-center pointer-events-none" style={{ zIndex: 20, top: '-3rem' }}>
+          <div className="relative w-full max-w-xl h-[34rem] pointer-events-auto">
+            <Suspense
+              fallback={
+                <div className="w-full h-full flex items-center justify-center" aria-hidden aria-busy="true">
+                  <div className="w-24 h-1 rounded-full bg-white/10 animate-pulse" />
+                </div>
+              }
+            >
+              <CigaretteScene
+                onCigaretteLit={handleCigaretteLit}
+                cigarettePosition={cigarettePosition}
+                skipIntro={skipIntro}
+                mainSpotlightPos={mainSpotlightPos}
+                rimLightPos={rimLightPos}
+                fillLightPos={fillLightPos}
+                frontFillLightPos={frontFillLightPos}
+                mainSpotlightIntensity={mainSpotlightIntensity}
+                rimLightIntensity={rimLightIntensity}
+                fillLightIntensity={fillLightIntensity}
+                frontFillLightIntensity={frontFillLightIntensity}
+                showLightIndicators={showLightIndicators}
+              />
+            </Suspense>
+          </div>
         </div>
-        {/* Title and subtitle - flow below cigarette */}
+
+        {/* Spacer - reserves vertical space for the visible cigarette above the title */}
+        <div className="h-[8rem]" aria-hidden />
+
+        {/* Title and subtitle - normal flow, z-index above canvas so clicks pass through */}
         <div
-          className="title-intro flex flex-col items-center gap-4 w-full px-5"
-          style={{ marginTop: '-24rem' }}
+          className="title-intro relative z-10 flex flex-col items-center gap-4 w-full px-5"
         >
-          <div
-            className="title-responsive"
+          <div className="title-responsive" style={{ textAlign: 'center', lineHeight: '.7' }}>
+            <div className="title-calvo mt-4 mb-6">Cig</div>
+            <div className="title-crush" aria-label="World">
+              {'WORLD'.split('').map((ch, i) => (
+                <span key={i} className="title-crush-ch" style={{ transform: `scaleY(${[1, 0.78, 0.62, 0.78, 1][i]})` }}>{ch}</span>
+              ))}
+            </div>
+          </div>
+          <div className="subtitle-intro flex justify-center gap-2 -my-2">
+            {[...Array(3)].map((_, i) => <span key={i} className="star">&#9733;</span>)}
+          </div>
+          <p
+            className="relative z-10 text-center uppercase px-5 mt-3 mb-3"
             style={{
-              fontFamily: "'Manufacturing Consent', sans-serif",
-              color: 'white',
-              textAlign: 'center',
-              letterSpacing: '0em',
-              lineHeight: '.7',
+              color: '#262262',
+              fontFamily: "'56th Street', sans-serif",
+              letterSpacing: '0.06em',
+              lineHeight: '1.3',
+              fontSize: '1rem',
             }}
           >
-            <div>Cig</div>
-            <div>World</div>
-          </div>
-          <div className="subtitle-intro w-full px-4 mt-2">
-            <p className="text-white/50 text-lg md:text-base text-center tracking-tight">
-              The Official App of Joey's Big Natural Italian Bachelor Bonanza 2026
-            </p>
-          </div>
+            The Official App of Joey's Big Natural Italian Bachelor Bonanza 2026
+          </p>
         </div>
-      </div>
       </section>
 
-      {/* Fixed cards peeking from bottom */}
+      {/* Game cards - inline below hero */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-50 px-6 py-4 flex flex-row items-end justify-center gap-0 cards-slide-up"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom) + 0.5rem)' }}
+        className="relative z-10 pt-6 pb-8 flex flex-row items-stretch justify-center gap-4 cards-slide-up"
+        style={{ paddingLeft: '20px', paddingRight: '20px' }}
       >
         <button
           type="button"
           onClick={handleDareCardClick}
-          className="card-dare card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
-            bg-[#242424] shadow-xl transition-colors bg-cover bg-center touch-manipulation"
+          className="card-dare card-press pack-container flex-1 basis-0 min-w-0 flex flex-col items-center justify-start p-4 min-h-[17.5rem] touch-manipulation"
         >
-          <span>Dare</span>
-          <img
-            src="/Subject%203.png"
-            alt=""
-            loading="lazy"
-            fetchPriority="low"
-            className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_white)_drop-shadow(-0.5px_0_0_white)_drop-shadow(0_0.5px_0_white)_drop-shadow(0_-0.5px_0_white)_drop-shadow(0.5px_0.5px_0_white)_drop-shadow(-0.5px_-0.5px_0_white)_drop-shadow(0.5px_-0.5px_0_white)_drop-shadow(-0.5px_0.5px_0_white)]"
-          />
+          <span className="card-label" style={{ color: '#262262' }}>Dare</span>
+          <div className="flex-1 flex items-center justify-center">
+            <img
+              src="/Subject%203.png"
+              alt=""
+              loading="lazy"
+              fetchPriority="low"
+              className="w-28 h-auto object-contain [filter:drop-shadow(0.5px_0_0_#262262)_drop-shadow(-0.5px_0_0_#262262)_drop-shadow(0_0.5px_0_#262262)_drop-shadow(0_-0.5px_0_#262262)]"
+            />
+          </div>
         </button>
         <button
           type="button"
           onClick={handleSmokeCardClick}
-          className="card-smoke card-press card-bg w-44 flex flex-col items-center justify-start gap-3 p-4 rounded-2xl border border-white/10 text-white text-lg min-h-[14rem]
-            bg-[#242424] shadow-xl transition-colors z-10 bg-cover bg-center touch-manipulation"
+          className="card-smoke card-press pack-container flex-1 basis-0 min-w-0 flex flex-col items-center justify-start p-4 min-h-[17.5rem] touch-manipulation"
         >
-          <span>Shoot</span>
-          <img
-            src="/cig-subject.png"
-            alt=""
-            loading="lazy"
-            fetchPriority="low"
-            className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_white)_drop-shadow(-0.375px_0_0_white)_drop-shadow(0_0.375px_0_white)_drop-shadow(0_-0.375px_0_white)_drop-shadow(0.375px_0.375px_0_white)_drop-shadow(-0.375px_-0.375px_0_white)_drop-shadow(0.375px_-0.375px_0_white)_drop-shadow(-0.375px_0.375px_0_white)]"
-          />
+          <span className="card-label" style={{ color: '#262262' }}>Shoot</span>
+          <div className="flex-1 flex items-center justify-center">
+            <img
+              src="/cig-subject.png"
+              alt=""
+              loading="lazy"
+              fetchPriority="low"
+              className="w-28 h-auto object-contain [filter:drop-shadow(0.375px_0_0_#262262)_drop-shadow(-0.375px_0_0_#262262)_drop-shadow(0_0.375px_0_#262262)_drop-shadow(0_-0.375px_0_#262262)]"
+            />
+          </div>
         </button>
       </div>
 
-      {/* Dare display - hidden for now */}
-      {/* <DareDisplay visible={showDare} /> */}
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 z-50 py-4 text-center" style={{ background: '#262262' }}>
+        <p style={{ color: '#EEEEF5', fontFamily: "'Druk Wide', sans-serif", fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          Alright, I'll Smoke One
+        </p>
+      </footer>
     </div>
     </IconContext.Provider>
   );

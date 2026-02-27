@@ -7,12 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        'punta-cana': {
-          sand: '#F4E4C1',
-          ocean: '#0077BE',
-          'ocean-deep': '#004E7C',
-          sunset: '#FF6B35',
-          palm: '#2D5016',
+        'calvo': {
+          light: '#BEBDDF',
+          mid: '#8B8DC0',
+          primary: '#6B6EA0',
+          dark: '#262262',
+          deep: '#1E1E52',
+          white: '#EEEEF5',
         }
       }
     },

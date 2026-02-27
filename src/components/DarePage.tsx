@@ -170,7 +170,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           alt=""
           className="w-48 h-auto max-w-[80vw] animate-dare-spin object-contain drop-shadow-lg mb-8"
         />
-        <p className="text-center text-xl text-[#1B1B1B]" style={{ fontFamily: "'Space Mono', monospace" }}>
+        <p className="text-center text-xl text-[#1B1B1B]" style={{ fontFamily: "'Druk Wide', sans-serif" }}>
           Preparing your punishment
         </p>
       </div>
@@ -184,7 +184,7 @@ export default function DarePage({ onBack }: DarePageProps) {
       >
         <p
           className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
-          style={{ fontFamily: "'Space Mono', monospace" }}
+          style={{ fontFamily: "'Druk Wide', sans-serif" }}
         >
           {currentPunishment}
         </p>
@@ -220,7 +220,7 @@ export default function DarePage({ onBack }: DarePageProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/60 px-6">
           <p
             className="text-center text-xl md:text-2xl font-bold text-white"
-            style={{ fontFamily: "'Space Mono', monospace" }}
+            style={{ fontFamily: "'Druk Wide', sans-serif" }}
           >
             NO SKIPS LEFT BITCH DO IT
           </p>
@@ -236,7 +236,7 @@ export default function DarePage({ onBack }: DarePageProps) {
       >
         <p
           className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
-          style={{ fontFamily: "'Space Mono', monospace" }}
+          style={{ fontFamily: "'Druk Wide', sans-serif" }}
         >
           {currentDare}
         </p>

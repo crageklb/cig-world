@@ -2,18 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: '56th Street';
+  src: url('/fonts/56thStreet-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Druk Text Wide';
+  src: url('/fonts/DrukTextWide-Medium.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Druk Wide';
+  src: url('/fonts/DrukWide-Medium.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 html {
   height: 100%;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   overflow: hidden;
-  background-color: #000000;
-  /* Black base ensures safe areas (notch, home indicator) stay black; gradients layer on top */
-  background:
-    radial-gradient(ellipse 150% 60% at 50% 0%, rgba(139, 90, 43, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(160, 100, 40, 0.4) 0%, transparent 60%),
-    radial-gradient(circle at center, #1a1a1a 20%, #000000 60%),
-    #000000;
+  background-color: #BEBDDF;
+  background: #BEBDDF;
   background-attachment: fixed;
 }
 
@@ -27,7 +46,7 @@ body {
   overflow: hidden;
   background: transparent;
   color: #1B1B1B;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Druk Wide', sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -248,20 +267,24 @@ body {
   }
 }
 
-@-webkit-keyframes cardsSlideUp {
+@-webkit-keyframes cardsFadeIn {
   0% {
-    -webkit-transform: translateY(100%);
+    opacity: 0;
+    -webkit-transform: translateY(40px);
   }
   100% {
-    -webkit-transform: translateY(20%);
+    opacity: 1;
+    -webkit-transform: translateY(0);
   }
 }
-@keyframes cardsSlideUp {
+@keyframes cardsFadeIn {
   0% {
-    transform: translateY(100%);
+    opacity: 0;
+    transform: translateY(40px);
   }
   100% {
-    transform: translateY(20%);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -822,6 +845,80 @@ body {
   }
 }
 
+/* Halftone dot overlay -- vintage print texture */
+.halftone-overlay {
+  background-image: radial-gradient(circle, rgba(38, 34, 98, 0.12) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+/* Bordered container -- like the pack's title panel */
+.pack-container {
+  background: #EEEEF5;
+  border: 3px solid #262262;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: inset 0 0 0 2.5px #EEEEF5, inset 0 0 0 5px #262262;
+}
+
+/* Banner label -- "ALRIGHT, I'LL SMOKE ONE" style */
+.pack-banner {
+  display: inline-block;
+  padding: 0.35rem 1.2rem;
+  background: #EEEEF5;
+  color: #262262;
+  border: 2px solid #262262;
+  border-radius: 4px;
+  font-family: 'Druk Wide', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* Top bar - stars extend past edges, clipped */
+.top-bar-stars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 2.5rem;
+  overflow: hidden;
+  padding: 0 2rem;
+}
+
+.top-bar-star {
+  color: #EEEEF5;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-shadow: 0 0 2px rgba(38, 34, 98, 0.4);
+  flex-shrink: 0;
+}
+
+/* Star row -- six stars like the pack rating */
+.star-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.star-row .star {
+  color: #EEEEF5;
+  font-size: 1rem;
+  line-height: 1;
+  text-shadow: 0 0 2px rgba(38, 34, 98, 0.4);
+}
+
+/* Card label */
+.card-label {
+  font-family: 'Druk Wide', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 2;
+}
+
 /* Exaggerated ease-out: strong deceleration at end */
 :root {
   --ease-out-exaggerated: cubic-bezier(0.16, 1, 0.3, 1);
@@ -844,21 +941,17 @@ body {
   transform: translateZ(0);
 }
 
-/* Cards: slide up with subtle overshoot and bounce */
+/* Cards: fade in and slide up */
 .cards-slide-up {
-  -webkit-transform: translateY(100%) translateZ(0);
-  transform: translateY(100%) translateZ(0);
-  -webkit-animation: cardsSlideUp 0.85s cubic-bezier(0.34, 1.2, 0.64, 1) 2.5s both;
-  animation: cardsSlideUp 0.85s cubic-bezier(0.34, 1.2, 0.64, 1) 2.5s both;
+  opacity: 0;
+  -webkit-transform: translateY(40px) translateZ(0);
+  transform: translateY(40px) translateZ(0);
+  -webkit-animation: cardsFadeIn 0.85s cubic-bezier(0.34, 1.2, 0.64, 1) 2.5s both;
+  animation: cardsFadeIn 0.85s cubic-bezier(0.34, 1.2, 0.64, 1) 2.5s both;
 }
 
 .card-dare {
-  -webkit-animation: cardDareRotate 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both;
-  animation: cardDareRotate 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both;
-  -webkit-transform-origin: bottom center;
-  transform-origin: bottom center;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+  transform: none;
 }
 
 .card-press {
@@ -870,21 +963,18 @@ body {
 }
 
 .card-smoke {
-  margin-left: -4rem;
-  -webkit-animation: cardSmokeRotate 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both,
-    cardSmokeOverlap 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both;
-  animation: cardSmokeRotate 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both,
-    cardSmokeOverlap 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 2.5s both;
-  -webkit-transform-origin: bottom center;
-  transform-origin: bottom center;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+  transform: none;
 }
 
 .card-dare.card-bg,
 .card-smoke.card-bg {
   position: relative;
   overflow: hidden;
+  background-color: #8B8DC0;
+  border: 2.5px solid #262262;
+  box-shadow:
+    inset 0 0 0 3px #BEBDDF,
+    0 4px 20px rgba(38, 34, 98, 0.5);
 }
 
 .card-dare.card-bg {
@@ -896,13 +986,13 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .8));
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, rgba(38, 34, 98, 0.15), rgba(38, 34, 98, 0.85));
+  box-shadow: inset 0 0 40px rgba(38, 34, 98, 0.4);
   pointer-events: none;
 }
 
 .card-dare.card-bg:hover::after {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.55));
+  background: linear-gradient(to bottom, rgba(38, 34, 98, 0.1), rgba(38, 34, 98, 0.65));
 }
 
 .card-smoke.card-bg {
@@ -914,13 +1004,13 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .8));
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, rgba(38, 34, 98, 0.15), rgba(38, 34, 98, 0.85));
+  box-shadow: inset 0 0 40px rgba(38, 34, 98, 0.4);
   pointer-events: none;
 }
 
 .card-smoke.card-bg:hover::after {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.55));
+  background: linear-gradient(to bottom, rgba(38, 34, 98, 0.1), rgba(38, 34, 98, 0.65));
 }
 
 /* Skip intro animations when navigating back from Dare */
@@ -943,15 +1033,13 @@ body {
 .intro-skipped .cards-slide-up {
   -webkit-animation: none;
   animation: none;
-  -webkit-transform: translateY(20%);
-  transform: translateY(20%);
+  opacity: 1;
+  -webkit-transform: none;
+  transform: none;
 }
 
 .intro-skipped .card-dare {
-  -webkit-animation: none;
-  animation: none;
-  -webkit-transform: rotate(-2deg);
-  transform: rotate(-2deg);
+  transform: none;
 }
 
 .intro-skipped .card-press:active {
@@ -959,11 +1047,7 @@ body {
 }
 
 .intro-skipped .card-smoke {
-  -webkit-animation: none;
-  animation: none;
-  -webkit-transform: rotate(3deg);
-  transform: rotate(3deg);
-  margin-left: -1.5rem;
+  transform: none;
 }
 
 /* Fallback when user prefers reduced motion */
@@ -978,36 +1062,81 @@ body {
   .cards-slide-up {
     -webkit-animation: none;
     animation: none;
-    -webkit-transform: translateY(20%) translateZ(0);
-    transform: translateY(20%) translateZ(0);
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
   }
   .card-dare {
-    -webkit-animation: none;
-    animation: none;
-    -webkit-transform: rotate(-2deg) translateZ(0);
-    transform: rotate(-2deg) translateZ(0);
+    transform: none;
   }
   .card-smoke {
-    -webkit-animation: none;
-    animation: none;
-    -webkit-transform: rotate(3deg) translateZ(0);
-    transform: rotate(3deg) translateZ(0);
-    margin-left: -1.5rem;
+    transform: none;
   }
 }
 
+/* "Cig" -- white fill with dark purple 3D extrusion (like CALVO) */
+.title-calvo {
+  font-family: '56th Street', 'Manufacturing Consent', sans-serif;
+  color: #EEEEF5;
+  -webkit-text-stroke: 3px #262262;
+  paint-order: stroke fill;
+  text-shadow:
+    -2px 2px 0 #262262,
+    -3px 3px 0 #262262,
+    -4px 4px 0 #262262,
+    -5px 5px 0 #262262,
+    -6px 6px 0 #262262,
+    -7px 7px 0 #262262,
+    -8px 8px 0 #1E1E52;
+  letter-spacing: 0.02em;
+}
+
+/* "World" -- solid dark purple, pinched arc (like CRUSH) */
+.title-crush {
+  font-family: 'Druk Text Wide', 'Bebas Neue', sans-serif;
+  color: #262262;
+  letter-spacing: 0.0em;
+  text-transform: uppercase;
+  font-size: 0.32em;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title-crush-ch {
+  display: inline-block;
+  transform-origin: center center;
+}
+
 .title-responsive {
-  font-size: min(11rem, calc(100vw - 40px));
+  font-size: min(14rem, calc(100vw - 40px));
 }
 
 @media (max-width: 480px) {
   .title-responsive {
-    font-size: 8rem;
+    font-size: 10rem;
+  }
+  .title-calvo {
+    -webkit-text-stroke: 2.5px #262262;
+    text-shadow:
+      -1.5px 1.5px 0 #262262,
+      -3px 3px 0 #262262,
+      -4.5px 4.5px 0 #262262,
+      -6px 6px 0 #1E1E52;
   }
 }
 
 @media (max-width: 360px) {
   .title-responsive {
     font-size: 7rem;
+  }
+  .title-calvo {
+    -webkit-text-stroke: 2px #262262;
+    text-shadow:
+      -1px 1px 0 #262262,
+      -2px 2px 0 #262262,
+      -3px 3px 0 #262262,
+      -4px 4px 0 #1E1E52;
   }
 }
