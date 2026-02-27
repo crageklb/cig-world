@@ -76,7 +76,7 @@ function App() {
 
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
-    <div className={`w-full h-dvh relative overflow-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
+    <div className={`w-full min-h-dvh relative overflow-y-auto overflow-x-hidden ${skipIntro ? 'intro-skipped' : ''}`}>
       {/* Top bar - stars across */}
       <header
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1 top-bar-stars"
@@ -328,10 +328,20 @@ function App() {
       </div>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-50 py-4 text-center" style={{ background: '#262262' }}>
-        <p style={{ color: '#EEEEF5', fontFamily: "'Druk Wide', sans-serif", fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+      <footer className="w-full py-3 text-center">
+        {/* Curves above */}
+        <svg viewBox="0 0 200 24" className="w-full" style={{ display: 'block', marginBottom: '6px', height: '20px' }}>
+          <path d="M 40 6 Q 100 20 160 6" fill="none" stroke="#262262" strokeWidth="2.5" strokeLinecap="round"/>
+          <path d="M 55 1 Q 100 12 145 1" fill="none" stroke="#262262" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+        <p style={{ color: '#262262', fontFamily: "'Druk Wide', sans-serif", fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           Alright, I'll Smoke One
         </p>
+        {/* Curves below */}
+        <svg viewBox="0 0 200 24" className="w-full" style={{ display: 'block', marginTop: '6px', height: '20px' }}>
+          <path d="M 55 23 Q 100 12 145 23" fill="none" stroke="#262262" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M 40 18 Q 100 4 160 18" fill="none" stroke="#262262" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
       </footer>
     </div>
     </IconContext.Provider>
