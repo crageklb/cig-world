@@ -3,23 +3,32 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import Cigarette from './Cigarette';
 import { AcceleratedZoom } from './AcceleratedZoom';
 import TargetedSpotlight from './TargetedSpotlight';
-import LighterFlame from './LighterFlame';
 import * as THREE from 'three';
 import { getPerformancePreset } from '../utils/deviceDetection';
+
+const SCENE_SCALE = 0.85;
+const SCENE_OFFSET_Y = 0.9;
 
 function FlameInteraction({
   onCigaretteLit,
   cigarettePosition = [0, 0, 5],
   skipIntro = false,
+  flameActive,
+  setFlameActive,
+  flamePosition,
+  setFlamePosition,
+  setFlameVelocity,
 }: {
   onCigaretteLit: () => void;
   cigarettePosition?: [number, number, number];
   skipIntro?: boolean;
+  flameActive: boolean;
+  setFlameActive: (v: boolean) => void;
+  flamePosition: [number, number, number];
+  setFlamePosition: (v: [number, number, number]) => void;
+  setFlameVelocity: (v: [number, number, number]) => void;
 }) {
   const { camera, gl, raycaster, pointer } = useThree();
-  const [flameActive, setFlameActive] = useState(false);
-  const [flamePosition, setFlamePosition] = useState<[number, number, number]>([0, 0, 5]);
-  const [flameVelocity, setFlameVelocity] = useState<[number, number, number]>([0, 0, 0]);
   const [shouldLightCig, setShouldLightCig] = useState(false);
   const [cigLit, setCigLit] = useState(false);
   const [tipPos, setTipPos] = useState<THREE.Vector3 | null>(null);
@@ -29,15 +38,21 @@ function FlameInteraction({
   const interactionPlaneRef = useRef<THREE.Mesh>(null);
   const collisionTimer = useRef(0);
 
+  const clientToNDC = (clientX: number, clientY: number) => {
+    const rect = gl.domElement.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    return { x, y };
+  };
+
   const updateFlamePosition = (clientX: number, clientY: number) => {
-    const x = (clientX / gl.domElement.clientWidth) * 2 - 1;
-    const y = -(clientY / gl.domElement.clientHeight) * 2 + 1;
+    const { x, y } = clientToNDC(clientX, clientY);
 
     pointer.set(x, y);
     raycaster.setFromCamera(pointer, camera);
 
     const direction = raycaster.ray.direction.clone();
-    const distance = 2.5;
+    const distance = 3.8;
     const point = camera.position.clone().add(direction.multiplyScalar(distance));
 
     const velocity: [number, number, number] = [
@@ -51,17 +66,10 @@ function FlameInteraction({
     previousPosition.current.copy(point);
   };
 
-  const handlePointerDown = (e: { clientX: number; clientY: number; intersections: unknown[] }) => {
+  const handlePointerDown = (e: { clientX: number; clientY: number; intersections: Array<{ point: THREE.Vector3 }> }) => {
     if (e.intersections.length > 0) {
-      const x = (e.clientX / gl.domElement.clientWidth) * 2 - 1;
-      const y = -(e.clientY / gl.domElement.clientHeight) * 2 + 1;
-
-      pointer.set(x, y);
-      raycaster.setFromCamera(pointer, camera);
-
-      const direction = raycaster.ray.direction.clone();
-      const distance = 2.5;
-      const point = camera.position.clone().add(direction.multiplyScalar(distance));
+      const hit = e.intersections[0];
+      const point = hit.point.clone();
 
       setFlameActive(true);
       setFlamePosition([point.x, point.y, point.z]);
@@ -77,7 +85,7 @@ function FlameInteraction({
       const handleUp = () => {
         isDraggingFlame.current = false;
         setFlameActive(false);
-        setFlameVelocity([0, 0, 0]);
+        setFlameVelocity([0, 0, 0] as [number, number, number]);
         collisionTimer.current = 0;
         window.removeEventListener('pointermove', handleMove);
         window.removeEventListener('pointerup', handleUp);
@@ -93,7 +101,7 @@ function FlameInteraction({
       const flamePosVec = new THREE.Vector3(...flamePosition);
       const distance = flamePosVec.distanceTo(tipPos);
 
-      if (distance < 0.4) {
+      if (distance < 0.5) {
         collisionTimer.current += delta;
 
         if (collisionTimer.current > 0.5) {
@@ -120,14 +128,6 @@ function FlameInteraction({
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
-      {flameActive && (
-        <LighterFlame
-          position={flamePosition}
-          velocity={flameVelocity}
-          intensity={0.3}
-        />
-      )}
-
       <Cigarette
         onLit={onCigaretteLit}
         flameActive={flameActive}
@@ -143,6 +143,11 @@ function FlameInteraction({
 export interface CigaretteSceneProps {
   onCigaretteLit: () => void;
   cigarettePosition: [number, number, number];
+  flameActive: boolean;
+  setFlameActive: (v: boolean) => void;
+  flamePosition: [number, number, number];
+  setFlamePosition: (v: [number, number, number]) => void;
+  setFlameVelocity: (v: [number, number, number]) => void;
   mainSpotlightPos: [number, number, number];
   rimLightPos: [number, number, number];
   fillLightPos: [number, number, number];
@@ -158,6 +163,11 @@ export interface CigaretteSceneProps {
 export default function CigaretteScene({
   onCigaretteLit,
   cigarettePosition,
+  flameActive,
+  setFlameActive,
+  flamePosition,
+  setFlamePosition,
+  setFlameVelocity,
   mainSpotlightPos,
   rimLightPos,
   fillLightPos,
@@ -180,6 +190,7 @@ export default function CigaretteScene({
     >
       <AcceleratedZoom />
       <ambientLight intensity={0.05} />
+      <group position={[0, SCENE_OFFSET_Y, 0]} scale={[SCENE_SCALE, SCENE_SCALE, SCENE_SCALE]}>
       <TargetedSpotlight
         position={mainSpotlightPos}
         targetPosition={[0, 0, 5]}
@@ -202,6 +213,8 @@ export default function CigaretteScene({
           </mesh>
         </group>
       )}
+      <pointLight position={fillLightPos} intensity={fillLightIntensity} color="#ffebd1" />
+      <pointLight position={frontFillLightPos} intensity={frontFillLightIntensity} color="#ffffff" />
       {!perfPreset.isMobile && (
         <>
           <TargetedSpotlight
@@ -224,7 +237,6 @@ export default function CigaretteScene({
               </mesh>
             </group>
           )}
-          <pointLight position={fillLightPos} intensity={fillLightIntensity} color="#ffebd1" />
           {showLightIndicators && (
             <group position={fillLightPos}>
               <mesh>
@@ -237,7 +249,6 @@ export default function CigaretteScene({
               </mesh>
             </group>
           )}
-          <pointLight position={frontFillLightPos} intensity={frontFillLightIntensity} color="#ffffff" />
           {showLightIndicators && (
             <group position={frontFillLightPos}>
               <mesh>
@@ -256,7 +267,13 @@ export default function CigaretteScene({
         onCigaretteLit={onCigaretteLit}
         cigarettePosition={cigarettePosition}
         skipIntro={skipIntro}
+        flameActive={flameActive}
+        setFlameActive={setFlameActive}
+        flamePosition={flamePosition}
+        setFlamePosition={setFlamePosition}
+        setFlameVelocity={setFlameVelocity}
       />
+      </group>
     </Canvas>
   );
 }

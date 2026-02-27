@@ -104,7 +104,7 @@ export default function DarePage({ onBack }: DarePageProps) {
   }, [phase]);
 
   return (
-    <div className="w-full h-dvh bg-gray-50 relative flex flex-col overflow-hidden">
+    <div className="w-full h-dvh relative flex flex-col overflow-hidden" style={{ backgroundColor: '#BEBDDF' }}>
       {phase === 'revealed' && (
         <button
           onClick={handleBackClick}
@@ -156,7 +156,7 @@ export default function DarePage({ onBack }: DarePageProps) {
         className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
           phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0'
         }`}
-        style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, white 100%)' }}
+        style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, #BEBDDF 100%)' }}
       />
 
       {/* Punishment loading: spinning Subject 5 + "Preparing your punishment" */}
@@ -273,7 +273,7 @@ export default function DarePage({ onBack }: DarePageProps) {
 
       {/* Mobile: fixed buttons at bottom - dare phase */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 bg-gray-50 transition-opacity duration-500 ${
+        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 transition-opacity duration-500 ${
           phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}

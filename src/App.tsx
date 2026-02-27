@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { IconContext } from '@phosphor-icons/react';
 import DarePage from './components/DarePage';
 import SmokePage from './components/SmokePage';
+import FlameOverlay from './components/FlameOverlay';
 
 const CigaretteScene = lazy(() => import('./components/CigaretteScene'));
 
@@ -19,6 +20,9 @@ function App() {
 
   const [currentPage, setCurrentPage] = useState<'home' | 'dare' | 'smoke'>('home');
   const [skipIntro, setSkipIntro] = useState(false);
+  const [flameActive, setFlameActive] = useState(false);
+  const [flamePosition, setFlamePosition] = useState<[number, number, number]>([0, 0, 5]);
+  const [flameVelocity, setFlameVelocity] = useState<[number, number, number]>([0, 0, 0]);
 
   const handleDareCardClick = () => {
     setCurrentPage('dare');
@@ -39,14 +43,14 @@ function App() {
   // Light positions - change these to move both light and indicator
   const mainSpotlightPos: [number, number, number] = [0, 3, 5]; // Directly above cigarette
   const rimLightPos: [number, number, number] = [6, 1, 5];
-  const fillLightPos: [number, number, number] = [0, -2, 6];
-  const frontFillLightPos: [number, number, number] = [-0.5, 0, 6]; // In front and to the left
+  const fillLightPos: [number, number, number] = [0, -0.5, 5.8];
+  const frontFillLightPos: [number, number, number] = [0, 0, 6.5]; // Slightly in front
 
   // Light intensities - change these to control light strength
   const mainSpotlightIntensity = 30;
   const rimLightIntensity = 10;
-  const fillLightIntensity = 3;
-  const frontFillLightIntensity = 2;
+  const fillLightIntensity = 1;
+  const frontFillLightIntensity = 10;
 
   // Show light indicators (spheres and cones) - set to true to show, false to hide
   const showLightIndicators = false;
@@ -77,16 +81,6 @@ function App() {
   return (
     <IconContext.Provider value={{ color: 'currentColor', size: 20, weight: 'light' }}>
     <div className={`w-full h-dvh relative overflow-hidden flex flex-col ${skipIntro ? 'intro-skipped' : ''}`}>
-      {/* Top bar - stars across */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-1 top-bar-stars"
-        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.25rem' }}
-      >
-        {[...Array(48)].map((_, i) => (
-          <span key={i} className="top-bar-star">&#9733;</span>
-        ))}
-      </header>
-
       {/* Noise overlay - fixed, visible at all scroll positions */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.15] z-[2] noise-overlay"
@@ -225,36 +219,39 @@ function App() {
         />
       </div>
 
-      {/* Hero section - takes its natural size, cards shrink around it */}
-      <section className="relative shrink-0 flex flex-col" style={{ paddingTop: '2.5rem' }}>
-        {/* Cigarette canvas - absolutely positioned, no layout impact */}
-        <div className="absolute inset-x-0 flex justify-center pointer-events-none" style={{ zIndex: 20, top: '-3rem' }}>
-          <div className="relative w-full max-w-xl h-[34rem] pointer-events-auto">
-            <Suspense
-              fallback={
-                <div className="w-full h-full flex items-center justify-center" aria-hidden aria-busy="true">
-                  <div className="w-24 h-1 rounded-full bg-white/10 animate-pulse" />
-                </div>
-              }
-            >
-              <CigaretteScene
-                onCigaretteLit={handleCigaretteLit}
-                cigarettePosition={cigarettePosition}
-                skipIntro={skipIntro}
-                mainSpotlightPos={mainSpotlightPos}
-                rimLightPos={rimLightPos}
-                fillLightPos={fillLightPos}
-                frontFillLightPos={frontFillLightPos}
-                mainSpotlightIntensity={mainSpotlightIntensity}
-                rimLightIntensity={rimLightIntensity}
-                fillLightIntensity={fillLightIntensity}
-                frontFillLightIntensity={frontFillLightIntensity}
-                showLightIndicators={showLightIndicators}
-              />
-            </Suspense>
-          </div>
-        </div>
+      {/* Cigarette canvas - full viewport so flame works anywhere */}
+      <div className="fixed inset-0 z-[5]">
+        <Suspense
+          fallback={
+            <div className="w-full h-full flex items-center justify-center" aria-hidden aria-busy="true">
+              <div className="w-24 h-1 rounded-full bg-white/10 animate-pulse" />
+            </div>
+          }
+        >
+          <CigaretteScene
+            onCigaretteLit={handleCigaretteLit}
+            cigarettePosition={cigarettePosition}
+            skipIntro={skipIntro}
+            flameActive={flameActive}
+            setFlameActive={setFlameActive}
+            flamePosition={flamePosition}
+            setFlamePosition={setFlamePosition}
+            setFlameVelocity={setFlameVelocity}
+            mainSpotlightPos={mainSpotlightPos}
+            rimLightPos={rimLightPos}
+            fillLightPos={fillLightPos}
+            frontFillLightPos={frontFillLightPos}
+            mainSpotlightIntensity={mainSpotlightIntensity}
+            rimLightIntensity={rimLightIntensity}
+            fillLightIntensity={fillLightIntensity}
+            frontFillLightIntensity={frontFillLightIntensity}
+            showLightIndicators={showLightIndicators}
+          />
+        </Suspense>
+      </div>
 
+      {/* Hero section - pointer-events-none so clicks pass through to canvas */}
+      <section className="relative shrink-0 flex flex-col pointer-events-none" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))', zIndex: 10 }}>
         {/* Spacer - reserves vertical space for the visible cigarette above the title */}
         <div className="flex-[0_0_8rem]" aria-hidden />
 
@@ -271,8 +268,8 @@ function App() {
               style={{ marginTop: '0.5rem' }}
             />
           </div>
-          <div className="subtitle-intro flex justify-center gap-2 -my-2">
-            {[...Array(3)].map((_, i) => <span key={i} className="star">&#9733;</span>)}
+          <div className="subtitle-intro flex justify-center gap-2 -mb-2">
+            {[...Array(3)].map((_, i) => <span key={i} className="star" style={{ color: '#EEEEF5' }}>&#9733;</span>)}
           </div>
           <p
             className="relative z-10 text-center uppercase px-5 mt-3 mb-3"
@@ -289,9 +286,9 @@ function App() {
         </div>
       </section>
 
-      {/* Game cards - shrinkable so they never overlap the title */}
+      {/* Game cards - pointer-events-auto so they remain clickable */}
       <div
-        className="relative z-10 min-h-0 pt-4 pb-4 flex flex-row items-stretch justify-center gap-4 cards-slide-up"
+        className="relative z-10 min-h-0 pt-4 pb-4 flex flex-row items-stretch justify-center gap-4 cards-slide-up pointer-events-auto"
         style={{ paddingLeft: '20px', paddingRight: '20px', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', flex: '0 1 20rem' }}
       >
         <button
@@ -328,6 +325,13 @@ function App() {
         </button>
       </div>
 
+      {currentPage === 'home' && (
+        <FlameOverlay
+          active={flameActive}
+          position={flamePosition}
+          velocity={flameVelocity}
+        />
+      )}
     </div>
     </IconContext.Provider>
   );
