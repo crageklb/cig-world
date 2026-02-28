@@ -143,6 +143,20 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     } catch { /* storage unavailable */ }
   }, [highScore]);
 
+  // White safe area during active play only; light purple on game over and when leaving (Safari theme-color)
+  useEffect(() => {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const restore = '#BEBDDF';
+    const update = (color: string) => {
+      meta?.setAttribute('content', color);
+    };
+    update(gameOver ? restore : '#ffffff');
+    return () => {
+      const m = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+      if (m) m.setAttribute('content', restore);
+    };
+  }, [gameOver]);
+
   cigsRef.current = cigs;
   dropletsRef.current = droplets;
   specialTargetsRef.current = specialTargets;
@@ -692,7 +706,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
             <img
               src="/Subject%209.png"
               alt=""
-              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[1] subject6-slide-up"
+              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[1] subject6-slide-up--game-over"
             />
           </div>
           {/* Gradient overlay - transparent top, light purple bottom */}

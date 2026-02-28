@@ -395,10 +395,25 @@ body {
   0% { transform: translateY(100vh); }
   100% { transform: translateY(40%); }
 }
+@supports (height: 100dvh) {
+  @-webkit-keyframes subject6SlideUp {
+    0% { -webkit-transform: translateY(100dvh); }
+    100% { -webkit-transform: translateY(40%); }
+  }
+  @keyframes subject6SlideUp {
+    0% { transform: translateY(100dvh); }
+    100% { transform: translateY(40%); }
+  }
+}
 
 .subject6-slide-up {
   -webkit-animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+/* Game over: delay so mobile layout settles; backwards = start hidden (0% keyframe) during delay */
+.subject6-slide-up--game-over {
+  -webkit-animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  animation: subject6SlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
 }
 
 @-webkit-keyframes cigShootUp {
