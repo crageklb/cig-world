@@ -257,7 +257,8 @@ function App() {
 
         {/* Title and subtitle - normal flow, z-index above canvas so clicks pass through */}
         <div
-          className="title-intro relative z-10 flex flex-col items-center gap-4 w-full px-5"
+          className="title-intro relative z-10 flex flex-col items-center gap-4 w-full"
+          style={{ paddingLeft: 'var(--view-padding-x)', paddingRight: 'var(--view-padding-x)' }}
         >
           <div className="title-responsive" style={{ textAlign: 'center', lineHeight: '.7' }}>
             <div className="title-calvo mt-4 mb-6">Cig</div>
@@ -272,13 +273,13 @@ function App() {
             {[...Array(3)].map((_, i) => <span key={i} className="star" style={{ color: '#EEEEF5' }}>&#9733;</span>)}
           </div>
           <p
-            className="relative z-10 text-center uppercase px-5 mt-3 mb-3"
+            className="relative z-10 text-center uppercase mt-3 mb-3 type-subtitle"
             style={{
+              paddingLeft: 'var(--view-padding-x)',
+              paddingRight: 'var(--view-padding-x)',
               color: '#262262',
-              fontFamily: "'56th Street', sans-serif",
               letterSpacing: '0.06em',
               lineHeight: '1.3',
-              fontSize: '1rem',
             }}
           >
             The Official App of Joey's Big Natural Italian Bachelor Bonanza 2026
@@ -289,14 +290,14 @@ function App() {
       {/* Game cards - pointer-events-auto so they remain clickable */}
       <div
         className="relative z-10 min-h-0 pt-4 pb-4 flex flex-row items-stretch justify-center gap-4 cards-slide-up pointer-events-auto"
-        style={{ paddingLeft: '20px', paddingRight: '20px', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', flex: '0 1 20rem' }}
+        style={{ paddingLeft: 'var(--view-padding-x)', paddingRight: 'var(--view-padding-x)', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', flex: '0 1 20rem' }}
       >
         <button
           type="button"
           onClick={handleDareCardClick}
           className="card-dare card-press pack-container flex-1 basis-0 min-w-0 min-h-0 flex flex-col items-center justify-start p-4 touch-manipulation"
         >
-          <span className="card-label shrink-0" style={{ color: '#262262' }}>Dare</span>
+          <span className="card-label shrink-0 text-[#1B1B1B]">Dare</span>
           <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
             <img
               src="/Subject%203.png"
@@ -312,7 +313,7 @@ function App() {
           onClick={handleSmokeCardClick}
           className="card-smoke card-press pack-container flex-1 basis-0 min-w-0 min-h-0 flex flex-col items-center justify-start p-4 touch-manipulation"
         >
-          <span className="card-label shrink-0" style={{ color: '#262262' }}>Shoot</span>
+          <span className="card-label shrink-0 text-[#1B1B1B]">Shoot</span>
           <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
             <img
               src="/cig-subject.png"

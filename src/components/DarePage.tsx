@@ -43,6 +43,16 @@ interface DarePageProps {
 
 const SKIPS_INITIAL = 3;
 
+/** Controls dare card + skip badge layout. Adjust these to change spacing/position. */
+const DARE_LAYOUT = {
+  /** Vertical offset: larger = dare sits higher, smaller = dare sits lower */
+  containerPaddingBottom: 'max(8rem, env(safe-area-inset-bottom) + 6rem)',
+  /** Space between dare card and skip badge */
+  cardToBadgeGap: '1rem', // mt-4 = 1rem
+  /** Space below dare card (before badge) */
+  cardMarginBottom: '3.5rem', // mb-10 = 2.5rem
+} as const;
+
 export default function DarePage({ onBack }: DarePageProps) {
   const [phase, setPhase] = useState<'spinning' | 'revealed' | 'punishment' | 'punishmentRevealed'>('spinning');
   const [currentDare, setCurrentDare] = useState('');
@@ -105,6 +115,8 @@ export default function DarePage({ onBack }: DarePageProps) {
 
   return (
     <div className="w-full h-dvh relative flex flex-col overflow-hidden" style={{ backgroundColor: '#BEBDDF' }}>
+      {/* Halftone dot overlay - vintage print texture (same as home) */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.35] z-0 halftone-overlay" />
       {phase === 'revealed' && (
         <button
           onClick={handleBackClick}
@@ -119,13 +131,13 @@ export default function DarePage({ onBack }: DarePageProps) {
           ) : (
             <ArrowLeft size={24} weight="regular" />
           )}
-          <span className="text-base font-medium">{isNavigating ? 'Loading…' : 'Big back'}</span>
+          <span className="type-btn type-btn--sm">{isNavigating ? 'Loading…' : 'Big back'}</span>
         </button>
       )}
 
       {/* Initial spinning image - centered, fades out when dare revealed */}
       <div
-        className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${
+        className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700 ${
           phase === 'revealed' || phase === 'punishment' || phase === 'punishmentRevealed' ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
@@ -153,7 +165,7 @@ export default function DarePage({ onBack }: DarePageProps) {
 
       {/* Punishment revealed only: gradient overlay - transparent top, white bottom */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-500 ${
           phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, #BEBDDF 100%)' }}
@@ -161,7 +173,7 @@ export default function DarePage({ onBack }: DarePageProps) {
 
       {/* Punishment loading: spinning Subject 5 + "Preparing your punishment" */}
       <div
-        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
           phase === 'punishment' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -177,7 +189,7 @@ export default function DarePage({ onBack }: DarePageProps) {
 
       {/* Punishment revealed: message + buttons - absolutely centered */}
       <div
-        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
           phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }}
@@ -194,7 +206,7 @@ export default function DarePage({ onBack }: DarePageProps) {
             type="button"
             onClick={handleBackClick}
             disabled={isNavigating}
-            className="px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
+            className="type-btn px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
           >
             {isNavigating ? (
               <>
@@ -208,7 +220,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleNewDare}
-            className="px-8 py-3 rounded-lg bg-[#1b1b1b] text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity touch-manipulation"
+            className="type-btn px-8 py-3 rounded-lg border-2 border-gray-400 bg-white text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
           >
             NEW DARE
           </button>
@@ -218,10 +230,7 @@ export default function DarePage({ onBack }: DarePageProps) {
       {/* No skips left message overlay */}
       {showNoSkipsMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/60 px-6">
-          <p
-            className="text-center text-xl md:text-2xl font-bold text-white"
-            style={{ fontFamily: "'Druk Wide', sans-serif" }}
-          >
+          <p className="text-center type-btn text-xl md:text-2xl font-bold text-white">
             NO SKIPS LEFT BITCH DO IT
           </p>
         </div>
@@ -229,99 +238,108 @@ export default function DarePage({ onBack }: DarePageProps) {
 
       {/* Dare text - absolutely centered in viewport */}
       <div
-        className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 flex flex-col items-center justify-center transition-opacity duration-500 ${
           phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }}
+        style={{
+          paddingLeft: 'var(--view-padding-x)',
+          paddingRight: 'var(--view-padding-x)',
+          paddingBottom: DARE_LAYOUT.containerPaddingBottom,
+        }}
       >
-        <p
-          className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
-          style={{ fontFamily: "'Druk Wide', sans-serif" }}
+        <div
+          className="title-responsive"
+          style={{ textAlign: 'center', lineHeight: '.7', fontSize: 'min(1.5rem, 6vw)', marginBottom: '1rem' }}
         >
-          {currentDare}
-        </p>
-        {/* Buttons: fixed at bottom on mobile, inline on desktop */}
-        <p className="hidden md:block text-center text-sm text-[#1B1B1B]/70 mb-2">Did he do it?</p>
-        <span
-          key={skipsRemaining}
-          className={`hidden md:inline-flex items-center justify-center gap-1.5 w-fit px-3 py-1 rounded-full text-xs font-medium mb-4 ${
-            skipsRemaining === 0 ? 'badge-wiggle text-white' : 'text-[#1B1B1B]/70 bg-[#1B1B1B]/10'
-          }`}
-          style={skipsRemaining === 0 ? { backgroundColor: '#dc2626' } : undefined}
-        >
-          <ArrowArcRight size={12} weight="regular" />
-          {skipsRemaining} {skipsRemaining === 1 ? 'skip' : 'skips'} left
-        </span>
-        <div className="hidden md:flex flex-row gap-4">
-          <button
-            type="button"
-            onClick={handleAccept}
-            className="px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
-          >
-            Accept
-          </button>
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="flex items-center justify-center gap-2 px-8 py-3 rounded-lg border-2 border-gray-400 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
-          >
-            <ArrowArcRight size={18} weight="bold" />
-            Skip
-          </button>
+          <div className="title-calvo title-calvo--sm">JOEY HAS TO...</div>
+        </div>
+        <div className="dare-card-outer max-w-2xl w-full block" style={{ marginBottom: DARE_LAYOUT.cardMarginBottom, marginLeft: 5, marginRight: 5 }}>
+          <div className="dare-card-container">
+            <p className="text-center type-heading text-[#1B1B1B]">
+              {currentDare}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Mobile: fixed buttons at bottom - dare phase */}
+      {/* Bottom sheet + skips badge: badge sits 16px above sheet, independent of dare card */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 transition-opacity duration-500 ${
+        className={`fixed bottom-0 left-0 right-0 z-10 flex flex-col-reverse items-center gap-4 ${
           phase === 'revealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}
       >
-        <p className="text-center text-lg text-[#1B1B1B]">Did he do it?</p>
+        {/* Bottom sheet */}
+        <div
+          className={`dare-bottom-sheet w-full bg-[#262262] flex flex-col gap-3 ${
+            phase === 'revealed' ? 'dare-bottom-sheet-visible' : ''
+          }`}
+          style={{
+            paddingLeft: 'var(--view-padding-x)',
+            paddingRight: 'var(--view-padding-x)',
+            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+            paddingTop: '1rem',
+          }}
+        >
+          <p className="text-center" style={{ marginBottom: '0rem' }}>
+            <span className="title-calvo title-calvo--sm" style={{ fontSize: 'min(1.5rem, 6vw)' }}>DID HE DO IT?</span>
+          </p>
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={handleAccept}
+              className="type-btn dare-btn-card flex-1 md:flex-none min-w-0 flex items-center justify-center gap-2 py-4 md:py-3 px-8 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
+            >
+              <Cigarette size={20} weight="bold" className="md:hidden" />
+              <span className="md:hidden">HELL YEAH</span>
+              <span className="hidden md:inline">Accept</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="type-btn dare-btn-card flex-1 md:flex-none min-w-0 flex items-center justify-center gap-2 py-4 md:py-3 px-8 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
+            >
+              <ArrowArcRight size={20} weight="bold" className="md:hidden" />
+              <ArrowArcRight size={18} weight="bold" className="hidden md:block" />
+              <span className="md:hidden">NOPE</span>
+              <span className="hidden md:inline">Skip</span>
+            </button>
+          </div>
+        </div>
+        {/* Skips badge - 16px above bottom sheet via gap-4 */}
         <span
           key={skipsRemaining}
-          className={`md:hidden inline-flex items-center justify-center mb-2 gap-1.5 w-fit self-center px-3 py-1 rounded-full text-xs font-medium ${
-            skipsRemaining === 0 ? 'badge-wiggle text-white' : 'text-[#1B1B1B]/70 bg-[#1B1B1B]/5'
-          }`}
-          style={skipsRemaining === 0 ? { backgroundColor: '#dc2626' } : undefined}
+          className={`type-caption inline-flex items-center justify-center gap-1.5 w-fit px-3 py-1 rounded-full shrink-0 ${
+            skipsRemaining === 0 ? 'badge-wiggle' : ''
+          } ${skipsRemaining >= SKIPS_INITIAL ? 'invisible' : ''}`}
+          style={{
+            ...(skipsRemaining === 0
+              ? { backgroundColor: '#dc2626', color: 'white' }
+              : { color: '#1B1B1B', backgroundColor: 'rgba(27, 27, 27, 0.1)' }),
+          }}
         >
           <ArrowArcRight size={12} weight="regular" />
           {skipsRemaining} {skipsRemaining === 1 ? 'skip' : 'skips'} left
         </span>
-        <div className="flex flex-row gap-3">
-          <button
-            type="button"
-            onClick={handleAccept}
-            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
-          >
-            <Cigarette size={20} weight="bold" />
-            HELL YEAH
-          </button>
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
-          >
-            <ArrowArcRight size={20} weight="bold" />
-            NOPE
-          </button>
-        </div>
       </div>
 
       {/* Mobile: fixed buttons at bottom - punishment phase */}
       <div
-        className={`md:hidden fixed bottom-0 left-0 right-0 flex flex-col gap-3 px-4 transition-opacity duration-500 ${
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-10 flex flex-col gap-3 transition-opacity duration-500 ${
           phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}
+        style={{
+          paddingLeft: 'var(--view-padding-x)',
+          paddingRight: 'var(--view-padding-x)',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+          paddingTop: '1rem',
+        }}
       >
         <div className="flex flex-row gap-3">
           <button
             type="button"
             onClick={handleBackClick}
             disabled={isNavigating}
-            className="flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
+            className="type-btn flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
           >
             {isNavigating ? (
               <>
@@ -335,7 +353,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleNewDare}
-            className="flex-1 min-w-0 py-4 rounded-xl bg-[#1b1b1b] shadow-sm text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity touch-manipulation"
+            className="type-btn flex-1 min-w-0 py-4 rounded-xl border-2 border-gray-400 bg-white shadow-sm text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
           >
             NEW DARE
           </button>

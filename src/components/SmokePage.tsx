@@ -60,7 +60,7 @@ const DROPLET_SPAWN_INTERVAL_BASE_MS = 1400;
 const DROPLET_SPAWN_INTERVAL_MIN_MS = 280;
 const DROPLET_SPAWN_JITTER_MS = 400;
 const COLLISION_RADIUS = 6;
-const CIG_TIP_OFFSET_Y = -3;
+const CIG_TIP_OFFSET_Y = -7; /* tip = top of cig (leading edge when shooting up); was -3 (center-ish) */
 const CIG_LIFETIME_MS = 3500;
 const MAX_CIGS_ON_SCREEN = 40;
 const MAX_SPLASHES_ON_SCREEN = 8;
@@ -134,6 +134,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   const whiteDropletIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const superCigActiveRef = useRef(false);
   const superCigEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastFireTimeRef = useRef(0);
 
   // Persist high score to localStorage
   useEffect(() => {
@@ -154,15 +155,16 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   superCigActiveRef.current = superCigActive;
 
   const spawnCig = useCallback(
-    (clientX: number, clientY: number, lockedToBottom = false) => {
+    (clientX: number, _clientY: number, lockedToBottom = false) => {
       if (gameOverRef.current) return;
       if (cigsRef.current.length >= MAX_CIGS_ON_SCREEN) return;
       const container = containerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
       const x = ((clientX - rect.left) / rect.width) * 100;
-      const y = lockedToBottom ? 95 : ((clientY - rect.top) / rect.height) * 100;
+      const y = lockedToBottom ? 95 : ((_clientY - rect.top) / rect.height) * 100;
       const id = nextCigId.current++;
+      lastFireTimeRef.current = performance.now();
       setCigs((prev) => [...prev, { id, x, y, spawnTime: performance.now() }]);
     },
     []
@@ -241,7 +243,16 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       e.preventDefault();
       const { clientX, clientY } = e;
       lastPosRef.current = { clientX, clientY };
-      spawnCig(clientX, clientY);
+
+      const fireInterval = bazookaJoeActiveRef.current
+        ? HOLD_INTERVAL_BAZOOKA_MS
+        : superCigActiveRef.current
+          ? HOLD_INTERVAL_SUPER_MS
+          : HOLD_INTERVAL_MS;
+      const now = performance.now();
+      if (now - lastFireTimeRef.current < fireInterval) return; /* rate limit */
+
+      spawnCig(clientX, clientY, true); /* always from bottom */
 
       holdTimeoutRef.current = setTimeout(() => {
         holdTimeoutRef.current = null;
@@ -281,6 +292,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   const handleRestart = useCallback(() => {
     gameOverRef.current = false;
     gameStartTimeRef.current = performance.now();
+    lastFireTimeRef.current = 0;
     pointsRef.current = 0;
     dropletPointsRef.current = 0;
     setGameOver(false);
@@ -604,6 +616,12 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       onPointerLeave={handlePointerLeave}
       onPointerCancel={handlePointerLeave}
     >
+      {/* Top edge gradient - fades to white */}
+      <div
+        className="fixed top-0 left-0 right-0 h-32 z-[2] pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, white 0%, transparent 100%)' }}
+      />
+
       {/* Back button */}
       <button
         onClick={onBack}
@@ -612,7 +630,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         aria-label="Back to home"
       >
         <ArrowLeft size={24} weight="regular" />
-        <span className="text-base font-medium">Big back</span>
+        <span className="type-btn type-btn--sm">Big back</span>
       </button>
 
       {/* SUPER CIG message */}
@@ -652,55 +670,67 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       >
         <div className="flex items-center gap-1.5">
           <Heart size={22} weight="fill" className="text-red-500" />
-          <span>{lives}</span>
+          <span className="type-subtitle">{lives}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Target size={22} weight="fill" className={bazookaJoeActive ? 'text-white' : 'text-[#1B1B1B]'} />
-          <span>{points}</span>
+          <span className="type-subtitle">{points}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Trophy size={22} weight="fill" className="text-amber-500" />
-          <span>{highScore}</span>
+          <span className="type-subtitle">{highScore}</span>
         </div>
       </div>
 
       {/* Game over overlay */}
       {gameOver && (
-        <div className="fixed inset-0 z-[70] flex flex-col bg-white">
-          {/* Subject 9 background - large, faded, at bottom */}
+        <div className="fixed inset-0 z-[70] flex flex-col" style={{ backgroundColor: '#BEBDDF' }}>
+          {/* Halftone overlay — background only, not on page content */}
+          <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.35] halftone-overlay" />
+          {/* Subject 9 background - large, slides up from bottom */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
             <img
               src="/Subject%209.png"
               alt=""
-              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[1] translate-y-[50%]"
+              className="w-[min(120vw,80rem)] h-auto object-contain opacity-[1] subject6-slide-up"
             />
           </div>
-          {/* Gradient overlay - same as Dare punishment: transparent top, white bottom */}
+          {/* Gradient overlay - transparent top, light purple bottom */}
           <div
             className="absolute inset-0 pointer-events-none z-[1]"
-            style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, white 100%)' }}
+            style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, #BEBDDF 100%)' }}
           />
-          <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-            <p className="text-2xl font-bold text-[#1B1B1B] mb-2">Game Over</p>
-            <p className="text-lg text-[#1B1B1B]/70">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 mb-36">
+            <div
+              className="title-responsive"
+              style={{ textAlign: 'center', lineHeight: '.7', fontSize: 'min(10rem, 28vw)' }}
+            >
+              <div className="title-calvo mb-6">GAME OVER</div>
+            </div>
+            <p className="type-subtitle text-xl text-[#1B1B1B]">
               Final score: {points} points
             </p>
           </div>
           <div
-            className="flex flex-row gap-3 px-4 pb-4 relative z-10"
-            style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '1rem' }}
+            className="flex flex-col gap-3 px-4 pb-4 relative z-10 w-full max-w-md mx-auto"
+            style={{
+              paddingLeft: 'var(--view-padding-x)',
+              paddingRight: 'var(--view-padding-x)',
+              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+              paddingTop: '1rem',
+            }}
           >
             <button
               type="button"
               onClick={handleRestart}
-              className="flex-1 min-w-0 py-4 bg-white rounded-xl border shadow-sm border-black/15 text-[#1B1B1B] font-semibold text-base active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation"
+              className="type-btn dare-btn-card w-full flex items-center justify-center py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
             >
               RESTART
             </button>
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 min-w-0 py-4 rounded-xl bg-[#1b1b1b] shadow-sm text-white font-semibold text-base active:opacity-80 hover:bg-[#1b1b1b]/90 transition-opacity touch-manipulation"
+              className="type-btn dare-btn-card w-full flex items-center justify-center py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
             >
               HOME
             </button>

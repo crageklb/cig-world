@@ -851,13 +851,58 @@ body {
   background-size: 4px 4px;
 }
 
-/* Bordered container -- like the pack's title panel */
+/* Dare card -- sharp rectangle behind, rounded white container on top */
+.dare-card-outer {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: white;
+  position: relative;
+  overflow: visible;
+  /* box-shadow so 3px stroke draws outside and isn't covered by overlapping inner */
+  box-shadow: 0 0 0 3px #262262;
+}
+.dare-card-container {
+  background: white;
+  border: 3px solid #262262;
+  border-radius: 36px;
+  padding: 1rem 1rem;
+  box-sizing: border-box;
+  /* extends 3px past outer on all sides (covers more of back card) */
+  margin: -3px;
+  width: calc(100% + 6px);
+}
+
+/* Bordered container -- like the pack's title panel (home cards use white) */
 .pack-container {
-  background: #EEEEF5;
+  background: white;
   border: 3px solid #262262;
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
-  box-shadow: inset 0 0 0 2.5px #EEEEF5, inset 0 0 0 5px #262262;
+  box-shadow: inset 0 0 0 2.5px white, inset 0 0 0 5px #262262;
+}
+
+/* Bottom sheet slide-up: starts below viewport, animates up after 200ms delay */
+@keyframes dareSheetSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.dare-bottom-sheet {
+  transform: translateY(100%);
+  /* Top, left, right stroke outside of path — matches dare-card-container radius (36px) */
+  box-shadow: 0 -3px 0 0 white, -3px 0 0 0 white, 3px 0 0 0 white;
+  border-radius: 36px 36px 0 0;
+}
+.dare-bottom-sheet.dare-bottom-sheet-visible {
+  animation: dareSheetSlideUp 0.4s cubic-bezier(0.33, 1, 0.68, 1) 1.5s forwards;
+}
+
+/* White button with same double border effect and roundness as home cards */
+.dare-btn-card {
+  background: white;
+  border: 3px solid #262262;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2.5px white, inset 0 0 0 5px #262262;
 }
 
 /* Banner label -- "ALRIGHT, I'LL SMOKE ONE" style */
@@ -909,10 +954,52 @@ body {
   text-shadow: 0 0 2px rgba(38, 34, 98, 0.4);
 }
 
-/* Card label */
-.card-label {
-  font-family: 'Druk Wide', sans-serif;
+/* ─── Type system ─────────────────────────────────────────────────────────
+   Font roles:
+   • Druk Wide      — Buttons, CTAs, labels (bold, uppercase)
+   • Druk Text Wide — Headings (impactful body text)
+   • 56th Street    — Supporting text, captions, body (characterful, warm)
+──────────────────────────────────────────────────────────────────────────── */
+
+/* Buttons, CTAs, card labels */
+.type-btn {
+  font-family: var(--font-druk-wide);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.type-btn--sm {
+  font-size: 0.8125rem; /* slightly smaller than type-btn */
+}
+/* Headings, dare text */
+.type-heading {
+  font-family: var(--font-druk-text);
   font-size: 1.5rem;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+@media (min-width: 768px) {
+  .type-heading {
+    font-size: 2rem;
+  }
+}
+/* Captions, small labels — 56th Street (small) */
+.type-caption {
+  font-family: var(--font-56th);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+/* Supporting text, subtitles — 56th Street (body size) */
+.type-subtitle {
+  font-family: var(--font-56th);
+  font-size: 1rem;
+}
+/* Card label - uses type-btn for consistency with other buttons */
+.card-label {
+  font-family: var(--font-druk-wide);
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   position: relative;
@@ -921,7 +1008,12 @@ body {
 
 /* Exaggerated ease-out: strong deceleration at end */
 :root {
+  --font-56th: '56th Street', sans-serif;
+  --font-druk-wide: 'Druk Wide', sans-serif;
+  --font-druk-text: 'Druk Text Wide', sans-serif;
   --ease-out-exaggerated: cubic-bezier(0.16, 1, 0.3, 1);
+  /** Horizontal padding: dare card, bottom sheet, home cards — adjust to change all */
+  --view-padding-x: 20px;
 }
 
 /* Title/subtitle: fade in after cigarette (0.6s), slow fade with exaggerated ease-out */
@@ -970,15 +1062,16 @@ body {
 .card-smoke.card-bg {
   position: relative;
   overflow: hidden;
-  background-color: #8B8DC0;
+  background-color: white;
   border: 2.5px solid #262262;
   box-shadow:
-    inset 0 0 0 3px #BEBDDF,
+    inset 0 0 0 3px white,
     0 4px 20px rgba(38, 34, 98, 0.5);
 }
 
 .card-dare.card-bg {
   background-image: url("/unsplash-1.png");
+  background-position: 15% center;
 }
 
 .card-dare.card-bg::after {
@@ -997,6 +1090,7 @@ body {
 
 .card-smoke.card-bg {
   background-image: url("/unsplash-2.png");
+  background-position: 85% center;
 }
 
 .card-smoke.card-bg::after {
@@ -1076,7 +1170,7 @@ body {
 
 /* "Cig" -- white fill with dark purple 3D extrusion (like CALVO) */
 .title-calvo {
-  font-family: '56th Street', 'Manufacturing Consent', sans-serif;
+  font-family: var(--font-56th);
   color: #EEEEF5;
   -webkit-text-stroke: 3px #262262;
   paint-order: stroke fill;
@@ -1090,7 +1184,6 @@ body {
     -8px 8px 0 #1E1E52;
   letter-spacing: 0.02em;
 }
-
 /* "World" -- solid dark purple, pinched arc (like CRUSH) */
 .title-crush {
   font-family: 'Druk Text Wide', 'Bebas Neue', sans-serif;
@@ -1139,4 +1232,15 @@ body {
       -3px 3px 0 #262262,
       -4px 4px 0 #1E1E52;
   }
+}
+
+/* Smaller text: tighter 3D shadow — must come after media queries to override */
+.title-calvo.title-calvo--sm {
+  -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.75) !important;
+  text-shadow:
+    -0.5px 0.5px 0 rgba(0, 0, 0, 0.75),
+    -1px 1px 0 rgba(0, 0, 0, 0.75),
+    -1.5px 1.5px 0 rgba(0, 0, 0, 0.75),
+    -2px 2px 0 rgba(0, 0, 0, 0.75),
+    -2.5px 2.5px 0 rgba(0, 0, 0, 0.75) !important;
 }
