@@ -2,26 +2,26 @@ import { useEffect, useState } from 'react';
 import { ArrowArcRight, ArrowLeft, CircleNotch, Cigarette } from '@phosphor-icons/react';
 
 const DARES = [
-  "Do 20 push-ups while someone holds a beer on your back!",
-  "Sing 'I Will Always Love You' at the top of your lungs to a stranger",
-  "Take a shot with your hands behind your back",
-  "Wear your shirt inside out and backwards for the next hour",
-  "Do your best salsa dance with a palm tree for 30 seconds",
-  "Challenge someone to a plank contest - loser buys next round!",
-  "Speak in a British accent for the next 15 minutes",
-  "Take a selfie with 5 strangers and post it to the group chat",
-  "Do the worm on the dance floor",
-  "Chug a beer while standing on one leg",
-  "Compliment 3 people in the most dramatic way possible",
-  "Create and perform a 30-second rap about the bachelor",
-  "Do 10 burpees right now, right here",
-  "Piggyback ride another groomsman to the bar and back",
-  "Tell the bartender your most embarrassing story",
-  "Dance with a mop or broom like it's your prom date",
-  "Attempt to limbo under an imaginary bar",
-  "Order your next drink in a made-up language",
-  "Do your best impression of the bachelor",
-  "Call your mom and tell her you love her (bonus points for tears)",
+  "do 20 push-ups while someone holds a beer on his back!",
+  "sing 'I Will Always Love You' at the top of his lungs to a stranger",
+  "take a shot with his hands behind his back",
+  "wear his shirt inside out and backwards for the next hour",
+  "do his best salsa dance with a palm tree for 30 seconds",
+  "challenge someone to a plank contest — loser buys next round!",
+  "speak in a British accent for the next 15 minutes",
+  "take a selfie with 5 strangers and post it to the group chat",
+  "do the worm on the dance floor",
+  "chug a beer while standing on one leg",
+  "compliment 3 people in the most dramatic way possible",
+  "create and perform a 30-second rap about the bachelor",
+  "do 10 burpees right now, right here",
+  "piggyback ride another groomsman to the bar and back",
+  "tell the bartender his most embarrassing story",
+  "dance with a mop or broom like it's his prom date",
+  "attempt to limbo under an imaginary bar",
+  "order his next drink in a made-up language",
+  "do his best impression of the bachelor",
+  "call his mom and tell her he loves her (bonus points for tears)",
 ];
 
 function pickRandomDare() {
@@ -29,8 +29,8 @@ function pickRandomDare() {
 }
 
 const PUNISHMENTS = [
-  'You all have to do a shot',
-  'You all have to shotgun a beer',
+  'do a shot',
+  'shotgun a beer',
 ];
 
 function pickRandomPunishment() {
@@ -182,31 +182,45 @@ export default function DarePage({ onBack }: DarePageProps) {
           alt=""
           className="w-48 h-auto max-w-[80vw] animate-dare-spin object-contain drop-shadow-lg mb-8"
         />
-        <p className="text-center text-xl text-[#1B1B1B]" style={{ fontFamily: "'Druk Wide', sans-serif" }}>
-          Preparing your punishment
-        </p>
+        <div
+          className="title-responsive"
+          style={{ textAlign: 'center', lineHeight: '.7', fontSize: 'min(1.5rem, 6vw)', marginTop: '2rem' }}
+        >
+          <div className="title-calvo title-calvo--sm">PREPARING YOUR PUNISHMENT...</div>
+        </div>
       </div>
 
-      {/* Punishment revealed: message + buttons - absolutely centered */}
+      {/* Punishment revealed: YOU ALL HAVE TO... + punishment card + buttons */}
       <div
-        className={`absolute inset-0 z-10 flex flex-col items-center justify-center px-6 transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 flex flex-col items-center justify-center transition-opacity duration-500 ${
           phase === 'punishmentRevealed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)' }}
+        style={{
+          paddingLeft: 'var(--view-padding-x)',
+          paddingRight: 'var(--view-padding-x)',
+          paddingBottom: 'max(6rem, env(safe-area-inset-bottom) + 5rem)',
+        }}
       >
-        <p
-          className="text-center text-xl md:text-2xl text-[#1B1B1B] leading-relaxed max-w-2xl mb-10"
-          style={{ fontFamily: "'Druk Wide', sans-serif" }}
+        <div
+          className="title-responsive"
+          style={{ textAlign: 'center', lineHeight: '.7', fontSize: 'min(1.5rem, 6vw)', marginBottom: '1rem' }}
         >
-          {currentPunishment}
-        </p>
-        {/* Desktop: inline buttons */}
-        <div className="hidden md:flex flex-row gap-4">
+          <div className="title-calvo title-calvo--sm">YOU ALL HAVE TO...</div>
+        </div>
+        <div className="dare-card-outer max-w-2xl w-full block" style={{ marginBottom: DARE_LAYOUT.cardMarginBottom, marginLeft: 5, marginRight: 5 }}>
+          <div className="dare-card-container">
+            <p className="text-center type-heading text-[#1B1B1B]">
+              {currentPunishment}
+            </p>
+          </div>
+        </div>
+        {/* Desktop: stacked buttons matching game over screen */}
+        <div className="hidden md:flex flex-col gap-3 w-full max-w-md mx-auto mt-6">
           <button
             type="button"
             onClick={handleBackClick}
             disabled={isNavigating}
-            className="type-btn px-8 py-3 rounded-lg border-2 bg-white border-gray-400 text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
+            className="type-btn dare-btn-card w-full flex items-center justify-center gap-2 py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
           >
             {isNavigating ? (
               <>
@@ -220,7 +234,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleNewDare}
-            className="type-btn px-8 py-3 rounded-lg border-2 border-gray-400 bg-white text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
+            className="type-btn dare-btn-card w-full flex items-center justify-center py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
           >
             NEW DARE
           </button>
@@ -334,12 +348,12 @@ export default function DarePage({ onBack }: DarePageProps) {
           paddingTop: '1rem',
         }}
       >
-        <div className="flex flex-row gap-3">
+        <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
           <button
             type="button"
             onClick={handleBackClick}
             disabled={isNavigating}
-            className="type-btn flex-1 min-w-0 flex items-center justify-center gap-2 py-4 rounded-xl bg-white border shadow-sm border-black/15 text-[#1B1B1B] active:opacity-80 hover:bg-black/5 hover:bg-gray-100 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
+            className="type-btn dare-btn-card w-full flex items-center justify-center gap-2 py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation disabled:opacity-70 disabled:pointer-events-none"
           >
             {isNavigating ? (
               <>
@@ -353,7 +367,7 @@ export default function DarePage({ onBack }: DarePageProps) {
           <button
             type="button"
             onClick={handleNewDare}
-            className="type-btn flex-1 min-w-0 py-4 rounded-xl border-2 border-gray-400 bg-white shadow-sm text-[#1B1B1B] active:opacity-80 hover:border-gray-600 hover:bg-gray-100 transition-all touch-manipulation"
+            className="type-btn dare-btn-card w-full flex items-center justify-center py-4 text-[#1B1B1B] active:opacity-80 hover:bg-gray-50 transition-all touch-manipulation"
           >
             NEW DARE
           </button>
