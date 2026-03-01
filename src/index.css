@@ -462,14 +462,26 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
+  text-align: center;
   -webkit-animation: superCigShake 2s ease-out forwards;
   animation: superCigShake 2s ease-out forwards;
   text-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
+.jojo-message-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  -webkit-animation: superCigShake 2s ease-out forwards;
+  animation: superCigShake 2s ease-out forwards;
+  text-shadow: 0 0 20px rgba(255,0,0,0.3), 0 0 40px rgba(255,50,50,0.2);
+}
+
 /* Cigarette bullet projectile */
 .cig-bullet-img {
-  width: 18px;
+  width: 14px;
   height: auto;
   object-fit: contain;
   transform: translate(-50%, -50%);
@@ -649,6 +661,35 @@ body {
   animation-delay: 0.4s;
 }
 
+/* JoJo Siwa target - red radioactive glow */
+@keyframes jojoRadioactiveGlow {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 10px rgba(255,50,50,0.9))
+      drop-shadow(0 0 25px rgba(255,0,0,0.7))
+      drop-shadow(0 0 45px rgba(200,0,0,0.5))
+      drop-shadow(0 0 60px rgba(255,50,50,0.3));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 14px rgba(255,80,80,1))
+      drop-shadow(0 0 35px rgba(255,30,30,0.9))
+      drop-shadow(0 0 55px rgba(255,0,0,0.6))
+      drop-shadow(0 0 80px rgba(255,50,50,0.4));
+  }
+}
+
+.jojo-target {
+  transform: translate(-50%, -50%);
+}
+
+.jojo-target-img {
+  width: 64px;
+  height: auto;
+  object-fit: contain;
+  animation: jojoRadioactiveGlow 1.5s ease-in-out infinite;
+}
+
 /* Default game background - tropical beach image */
 .game-bg-tropical {
   background: url('/game-bg-tropical.png') center / cover no-repeat;
@@ -671,7 +712,11 @@ body {
 /* Demonic face background - fades in over 20s */
 @keyframes bazookaFaceIn {
   0% { opacity: 0; }
-  100% { opacity: 0.7; }
+  100% { opacity: 0.9; }
+}
+@keyframes bazookaFaceOverlayIn {
+  0% { opacity: 0; }
+  100% { opacity: 0.45; }
 }
 
 @keyframes bazookaEyeGlow {
@@ -701,7 +746,7 @@ body {
   object-fit: cover;
   object-position: center 30%;
   animation: bazookaFaceIn 20s ease-in forwards;
-  filter: saturate(0.3) contrast(1.3) brightness(0.6);
+  filter: saturate(0.4) contrast(1.2) brightness(0.75);
 }
 
 .bazooka-face-overlay {
@@ -714,7 +759,7 @@ body {
     rgba(60, 0, 0, 0.6) 100%
   );
   mix-blend-mode: multiply;
-  animation: bazookaFaceIn 20s ease-in forwards;
+  animation: bazookaFaceOverlayIn 20s ease-in forwards;
 }
 
 /* Screen shake */
@@ -748,12 +793,14 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
+  max-width: calc(100vw - 2rem);
+  padding: 0 1rem;
+  text-align: center;
   animation: bazookaTextEntry 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   text-shadow:
     0 0 20px rgba(255,120,0,0.8),
     0 0 40px rgba(255,80,0,0.4),
     0 2px 0 rgba(0,0,0,0.3);
-  white-space: nowrap;
 }
 
 /* Rocket projectile (Subject 3 in bazooka mode) */

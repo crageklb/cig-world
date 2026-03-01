@@ -6,6 +6,8 @@ interface CigShot {
   x: number;
   y: number;
   spawnTime: number;
+  vx?: number;
+  curvePhase?: number;
 }
 
 interface Droplet {
@@ -37,6 +39,13 @@ interface BazookaTarget {
   spawnTime: number;
 }
 
+interface JoJoTarget {
+  id: number;
+  x: number;
+  y: number;
+  spawnTime: number;
+}
+
 const SPECIAL_TARGET_IMAGES = [
   '/subject-special.png',
   '/subject-special-2.png',
@@ -45,7 +54,7 @@ const SPECIAL_TARGET_IMAGES = [
 ];
 
 const LIVES_INITIAL = 3;
-const HOLD_INTERVAL_MS = 450;
+const HOLD_INTERVAL_MS = 380;
 const HOLD_INTERVAL_SUPER_MS = 80;
 const HOLD_INTERVAL_BAZOOKA_MS = 100;
 const HOLD_DELAY_MS = 120;
@@ -53,12 +62,12 @@ const SUPER_CIG_DURATION_MS = 10000;
 const SUPER_CIG_TRIGGER_EVERY = 50;
 const CIG_SPEED = 0.38;
 const CIG_SPEED_BAZOOKA = 0.75;
-const DROPLET_SPEED_BASE = 0.10;
-const DROPLET_SPEED_MAX = 0.35;
+const DROPLET_SPEED_BASE = 0.08;
+const DROPLET_SPEED_MAX = 0.30;
 const DROPLET_SPEED_BAZOOKA_BOOST = 0.06;
-const DROPLET_SPAWN_INTERVAL_BASE_MS = 1400;
-const DROPLET_SPAWN_INTERVAL_MIN_MS = 280;
-const DROPLET_SPAWN_JITTER_MS = 400;
+const DROPLET_SPAWN_INTERVAL_BASE_MS = 1100;
+const DROPLET_SPAWN_INTERVAL_MIN_MS = 220;
+const DROPLET_SPAWN_JITTER_MS = 350;
 const COLLISION_RADIUS = 6;
 const CIG_TIP_OFFSET_Y = -7; /* tip = top of cig (leading edge when shooting up); was -3 (center-ish) */
 const CIG_LIFETIME_MS = 3500;
@@ -67,14 +76,20 @@ const MAX_SPLASHES_ON_SCREEN = 8;
 const SPLASH_DURATION_MS = 520;
 const SPECIAL_TARGET_POINTS = 100;
 const SPECIAL_TARGET_COLLISION_RADIUS = 12;
-const SPECIAL_TARGET_SPEED = 0.08;
-const SPECIAL_TARGET_SPAWN_MIN_MS = 3500;
-const SPECIAL_TARGET_SPAWN_MAX_MS = 8000;
+const SPECIAL_TARGET_SPEED = 0.065;
+const SPECIAL_TARGET_SPAWN_MIN_MS = 1000;
+const SPECIAL_TARGET_SPAWN_MAX_MS = 2800;
 const BAZOOKA_TARGET_COLLISION_RADIUS = 12;
 const BAZOOKA_TARGET_SPEED = 0.06;
 const BAZOOKA_TARGET_INITIAL_DELAY_MS = 30000;
 const BAZOOKA_TARGET_SPAWN_MIN_MS = 30000;
 const BAZOOKA_TARGET_SPAWN_MAX_MS = 60000;
+const JOJO_TARGET_COLLISION_RADIUS = 12;
+const JOJO_TARGET_SPEED = 0.07;
+const JOJO_TARGET_INITIAL_DELAY_MS = 8000;
+const JOJO_TARGET_SPAWN_MIN_MS = 18000;
+const JOJO_TARGET_SPAWN_MAX_MS = 35000;
+const JOJO_SNAKEY_DURATION_MS = 3000;
 const BAZOOKA_DURATION_MS = 20000;
 const WHITE_DROPLET_SPAWN_INTERVAL_MS = 600;
 
@@ -105,12 +120,16 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   const [showSuperCigMessage, setShowSuperCigMessage] = useState(false);
   const [bazookaJoeActive, setBazookaJoeActive] = useState(false);
   const [showBazookaMessage, setShowBazookaMessage] = useState(false);
+  const [showJojoMessage, setShowJojoMessage] = useState(false);
   const [bazookaTargets, setBazookaTargets] = useState<BazookaTarget[]>([]);
+  const [jojoTargets, setJojoTargets] = useState<JoJoTarget[]>([]);
+  const [snakeyModeActive, setSnakeyModeActive] = useState(false);
 
   const nextCigId = useRef(0);
   const nextDropletId = useRef(0);
   const nextSpecialTargetId = useRef(0);
   const nextBazookaTargetId = useRef(0);
+  const nextJojoTargetId = useRef(0);
   const nextSplashId = useRef(0);
   const holdIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -121,6 +140,10 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   const dropletsRef = useRef<Droplet[]>([]);
   const specialTargetsRef = useRef<SpecialTarget[]>([]);
   const bazookaTargetsRef = useRef<BazookaTarget[]>([]);
+  const jojoTargetsRef = useRef<JoJoTarget[]>([]);
+  const snakeyModeActiveRef = useRef(false);
+  const snakeyEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const jojoTargetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const splashesRef = useRef<Splash[]>([]);
   const gameStartTimeRef = useRef(performance.now());
   const gameOverRef = useRef(false);
@@ -161,6 +184,8 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
   dropletsRef.current = droplets;
   specialTargetsRef.current = specialTargets;
   bazookaTargetsRef.current = bazookaTargets;
+  jojoTargetsRef.current = jojoTargets;
+  snakeyModeActiveRef.current = snakeyModeActive;
   splashesRef.current = splashes;
   bazookaJoeActiveRef.current = bazookaJoeActive;
   gameOverRef.current = gameOver;
@@ -179,7 +204,17 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const y = lockedToBottom ? 95 : ((_clientY - rect.top) / rect.height) * 100;
       const id = nextCigId.current++;
       lastFireTimeRef.current = performance.now();
-      setCigs((prev) => [...prev, { id, x, y, spawnTime: performance.now() }]);
+      const spawnTime = performance.now();
+      const base = { id, x, y, spawnTime };
+      if (snakeyModeActiveRef.current) {
+        setCigs((prev) => [...prev, {
+          ...base,
+          vx: (Math.random() - 0.5) * 3,
+          curvePhase: Math.random() * Math.PI * 2,
+        }]);
+      } else {
+        setCigs((prev) => [...prev, base]);
+      }
     },
     []
   );
@@ -197,7 +232,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     const dpts = dropletPointsRef.current;
     const intervalMax = Math.max(
       DROPLET_SPAWN_INTERVAL_MIN_MS,
-      DROPLET_SPAWN_INTERVAL_BASE_MS - dpts * 40 - elapsedSec * 25
+      DROPLET_SPAWN_INTERVAL_BASE_MS - dpts * 12 - elapsedSec * 8
     );
     const delay = intervalMax + Math.random() * DROPLET_SPAWN_JITTER_MS;
     spawnTimeoutRef.current = setTimeout(() => {
@@ -246,6 +281,27 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     }, delay);
     return t;
   }, [spawnBazookaTarget]);
+
+  const spawnJojoTarget = useCallback(() => {
+    if (gameOverRef.current || bazookaJoeActiveRef.current) return;
+    const x = 15 + Math.random() * 70;
+    const id = nextJojoTargetId.current++;
+    setJojoTargets((prev) => [...prev, { id, x, y: -8, spawnTime: performance.now() }]);
+  }, []);
+
+  const scheduleNextJojoTarget = useCallback((): ReturnType<typeof setTimeout> | null => {
+    if (gameOverRef.current) return null;
+    const delay =
+      JOJO_TARGET_SPAWN_MIN_MS +
+      Math.random() * (JOJO_TARGET_SPAWN_MAX_MS - JOJO_TARGET_SPAWN_MIN_MS);
+    const t = setTimeout(() => {
+      if (!bazookaJoeActiveRef.current) {
+        spawnJojoTarget();
+      }
+      scheduleNextJojoTarget();
+    }, delay);
+    return t;
+  }, [spawnJojoTarget]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     lastPosRef.current = { clientX: e.clientX, clientY: e.clientY };
@@ -324,9 +380,14 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     superCigActiveRef.current = false;
     setBazookaJoeActive(false);
     setShowBazookaMessage(false);
+    setShowJojoMessage(false);
     bazookaJoeActiveRef.current = false;
     setBazookaTargets([]);
+    setJojoTargets([]);
+    setSnakeyModeActive(false);
     bazookaTargetsRef.current = [];
+    jojoTargetsRef.current = [];
+    snakeyModeActiveRef.current = false;
     cigsRef.current = [];
     dropletsRef.current = [];
     if (superCigEndTimeoutRef.current) {
@@ -348,6 +409,14 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     if (bazookaTargetTimeoutRef.current) {
       clearTimeout(bazookaTargetTimeoutRef.current);
       bazookaTargetTimeoutRef.current = null;
+    }
+    if (jojoTargetTimeoutRef.current) {
+      clearTimeout(jojoTargetTimeoutRef.current);
+      jojoTargetTimeoutRef.current = null;
+    }
+    if (snakeyEndTimeoutRef.current) {
+      clearTimeout(snakeyEndTimeoutRef.current);
+      snakeyEndTimeoutRef.current = null;
     }
   }, []);
 
@@ -390,6 +459,21 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
     };
   }, [gameOver, scheduleNextBazookaTarget]);
 
+  // JoJo target spawning - after 8s, freq between special and bazooka
+  useEffect(() => {
+    if (gameOver) return;
+    const initialDelay = setTimeout(() => {
+      jojoTargetTimeoutRef.current = scheduleNextJojoTarget();
+    }, JOJO_TARGET_INITIAL_DELAY_MS);
+    return () => {
+      clearTimeout(initialDelay);
+      if (jojoTargetTimeoutRef.current) {
+        clearTimeout(jojoTargetTimeoutRef.current);
+        jojoTargetTimeoutRef.current = null;
+      }
+    };
+  }, [gameOver, scheduleNextJojoTarget]);
+
   // Game loop
   useEffect(() => {
     const loop = () => {
@@ -413,10 +497,16 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const currentDroplets = dropletsRef.current;
       const currentSpecialTargets = specialTargetsRef.current;
       const currentBazookaTargets = bazookaTargetsRef.current;
+      const currentJojoTargets = jojoTargetsRef.current;
 
-      const updatedCigs = currentCigs
-        .map((c) => ({ ...c, y: c.y - cigSpeed }))
-        .filter((c) => c.y > -20 && now - c.spawnTime < CIG_LIFETIME_MS);
+      const updatedCigs = currentCigs.map((c) => {
+        if (c.vx != null && c.curvePhase != null) {
+          const t = (now - c.spawnTime) / 1000;
+          const curveX = Math.sin(t * 4 + c.curvePhase) * 2.5;
+          return { ...c, x: c.x + (c.vx ?? 0) * 0.15 + curveX, y: c.y - cigSpeed };
+        }
+        return { ...c, y: c.y - cigSpeed };
+      }).filter((c) => c.y > -20 && now - c.spawnTime < CIG_LIFETIME_MS);
 
       const updatedDroplets = currentDroplets.map((d) => ({
         ...d,
@@ -431,6 +521,11 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const updatedBazookaTargets = currentBazookaTargets.map((t) => ({
         ...t,
         y: t.y + BAZOOKA_TARGET_SPEED,
+      }));
+
+      const updatedJojoTargets = currentJojoTargets.map((t) => ({
+        ...t,
+        y: t.y + JOJO_TARGET_SPEED,
       }));
 
       // Droplets that passed bottom = lose life
@@ -455,6 +550,14 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
               clearTimeout(bazookaTargetTimeoutRef.current);
               bazookaTargetTimeoutRef.current = null;
             }
+            if (jojoTargetTimeoutRef.current) {
+              clearTimeout(jojoTargetTimeoutRef.current);
+              jojoTargetTimeoutRef.current = null;
+            }
+            if (snakeyEndTimeoutRef.current) {
+              clearTimeout(snakeyEndTimeoutRef.current);
+              snakeyEndTimeoutRef.current = null;
+            }
             if (bazookaEndTimeoutRef.current) {
               clearTimeout(bazookaEndTimeoutRef.current);
               bazookaEndTimeoutRef.current = null;
@@ -473,6 +576,7 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const hitSpecialTargetIds = new Set<number>();
       const hitSpecialTargetPositions: Array<{ x: number; y: number }> = [];
       const hitBazookaTargetIds = new Set<number>();
+      const hitJojoTargetIds = new Set<number>();
 
       for (const cig of updatedCigs) {
         const cigTipY = cig.y + CIG_TIP_OFFSET_Y;
@@ -501,6 +605,15 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
           if (dx * dx + dy * dy < BAZOOKA_TARGET_COLLISION_RADIUS * BAZOOKA_TARGET_COLLISION_RADIUS) {
             hitCigIds.add(cig.id);
             hitBazookaTargetIds.add(bt.id);
+          }
+        }
+        for (const jt of updatedJojoTargets) {
+          if (jt.y < 0 || jt.y > 100) continue;
+          const dx = cig.x - jt.x;
+          const dy = cigTipY - jt.y;
+          if (dx * dx + dy * dy < JOJO_TARGET_COLLISION_RADIUS * JOJO_TARGET_COLLISION_RADIUS) {
+            hitCigIds.add(cig.id);
+            hitJojoTargetIds.add(jt.id);
           }
         }
       }
@@ -557,6 +670,20 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         setSplashes(splashesRef.current);
       }
 
+      // JoJo target hit - activate SNAKEY MODE (cigs curve randomly for 3s)
+      if (hitJojoTargetIds.size > 0) {
+        snakeyModeActiveRef.current = true;
+        setSnakeyModeActive(true);
+        setShowJojoMessage(true);
+        setTimeout(() => setShowJojoMessage(false), 3000);
+        if (snakeyEndTimeoutRef.current) clearTimeout(snakeyEndTimeoutRef.current);
+        snakeyEndTimeoutRef.current = setTimeout(() => {
+          snakeyModeActiveRef.current = false;
+          setSnakeyModeActive(false);
+          snakeyEndTimeoutRef.current = null;
+        }, JOJO_SNAKEY_DURATION_MS);
+      }
+
       // Bazooka target hit - activate BAZOOKA JOE MODE
       if (hitBazookaTargetIds.size > 0 && !bazookaJoeActiveRef.current) {
         bazookaJoeActiveRef.current = true;
@@ -592,6 +719,9 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       const finalBazookaTargets = updatedBazookaTargets.filter(
         (t) => !hitBazookaTargetIds.has(t.id) && t.y <= 100
       );
+      const finalJojoTargets = updatedJojoTargets.filter(
+        (t) => !hitJojoTargetIds.has(t.id) && t.y <= 100
+      );
 
       // Remove expired splashes
       const currentSplashes = splashesRef.current;
@@ -607,11 +737,13 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       dropletsRef.current = finalDroplets;
       specialTargetsRef.current = finalSpecialTargets;
       bazookaTargetsRef.current = finalBazookaTargets;
+      jojoTargetsRef.current = finalJojoTargets;
 
       setCigs(finalCigs);
       setDroplets(finalDroplets);
       setSpecialTargets(finalSpecialTargets);
       setBazookaTargets(finalBazookaTargets);
+      setJojoTargets(finalJojoTargets);
 
       frameRef.current = requestAnimationFrame(loop);
     };
@@ -630,11 +762,13 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
       onPointerLeave={handlePointerLeave}
       onPointerCancel={handlePointerLeave}
     >
-      {/* Top edge gradient - fades to white */}
-      <div
-        className="fixed top-0 left-0 right-0 h-32 z-[2] pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, white 0%, transparent 100%)' }}
-      />
+      {/* Top edge gradient - fades to white (hidden during Bazooka Joe) */}
+      {!bazookaJoeActive && (
+        <div
+          className="fixed top-0 left-0 right-0 h-32 z-[2] pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, white 0%, transparent 100%)' }}
+        />
+      )}
 
       {/* Back button */}
       <button
@@ -652,6 +786,15 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
         <div className="fixed inset-0 z-[65] flex items-center justify-center pointer-events-none">
           <p className="super-cig-text text-4xl md:text-6xl font-black text-[#1B1B1B] uppercase tracking-tighter">
             SUPER CIG
+          </p>
+        </div>
+      )}
+
+      {/* JoJo hit message */}
+      {showJojoMessage && !bazookaJoeActive && (
+        <div className="fixed inset-0 z-[65] flex items-center justify-center pointer-events-none">
+          <p className="jojo-message-text text-3xl md:text-5xl font-black text-red-500 uppercase tracking-tighter text-center px-4">
+            OOPS JOJO FUCKED UP UR CIGS
           </p>
         </div>
       )}
@@ -815,6 +958,21 @@ export default function SmokePage({ onBack }: { onBack: () => void }) {
             src="/cig-subject.png"
             alt=""
             className="bazooka-target-img"
+          />
+        </div>
+      ))}
+
+      {/* JoJo Siwa targets - red radioactive glow, triggers snakey cig mode */}
+      {jojoTargets.map(({ id, x, y }) => (
+        <div
+          key={id}
+          className="jojo-target absolute pointer-events-none"
+          style={{ left: `${x}%`, top: `${y}%` }}
+        >
+          <img
+            src="/jojo-siwa.png"
+            alt=""
+            className="jojo-target-img"
           />
         </div>
       ))}

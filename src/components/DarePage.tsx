@@ -1,31 +1,60 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowArcRight, ArrowLeft, CircleNotch, Cigarette } from '@phosphor-icons/react';
 
 const DARES = [
-  "do 20 push-ups while someone holds a beer on his back!",
-  "sing 'I Will Always Love You' at the top of his lungs to a stranger",
-  "take a shot with his hands behind his back",
-  "wear his shirt inside out and backwards for the next hour",
-  "do his best salsa dance with a palm tree for 30 seconds",
-  "challenge someone to a plank contest — loser buys next round!",
-  "speak in a British accent for the next 15 minutes",
-  "take a selfie with 5 strangers and post it to the group chat",
-  "do the worm on the dance floor",
-  "chug a beer while standing on one leg",
-  "compliment 3 people in the most dramatic way possible",
-  "create and perform a 30-second rap about the bachelor",
-  "do 10 burpees right now, right here",
-  "piggyback ride another groomsman to the bar and back",
-  "tell the bartender his most embarrassing story",
-  "dance with a mop or broom like it's his prom date",
-  "attempt to limbo under an imaginary bar",
-  "order his next drink in a made-up language",
-  "do his best impression of the bachelor",
-  "call his mom and tell her he loves her (bonus points for tears)",
+  "do whatever Wes says",
+  "do whatever Craig says",
+  "do whatever Dom says",
+  "do whatever Dean says",
+  "do whatever Sully says",
+  "order a \"bussy boy\" from the bar",
+  "finish his drink",
+  "go do a cannonball into the pool",
+  "run into the ocean right now",
+  "ask a staff member \"where's the closest toilet time?\"",
+  "do 10 pushups while smoking a cig",
+  "take a shot and do an exaggerated cum face",
+  "shotgun a beer",
+  "tell the bartender your name at least 5 times while ordering a drink",
+  "announce \"I'm gonna cum\" when you take your next shot",
 ];
 
-function pickRandomDare() {
-  return DARES[Math.floor(Math.random() * DARES.length)];
+const WHATEVER_DARES = DARES.filter((d) => d.includes("whatever "));
+const OTHER_DARES = DARES.filter((d) => !d.includes("whatever "));
+
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/** Builds a queue of dares: randomly rotated, with at least one "whatever X says" every 2 dares. */
+function buildDareQueue(): string[] {
+  const whateverShuffled = shuffle(WHATEVER_DARES);
+  const otherShuffled = shuffle(OTHER_DARES);
+  // Interleave [whatever, other] - strict alternating so no two "other" are adjacent
+  const whateverExpanded: string[] = [];
+  for (let i = 0; i < otherShuffled.length; i++) {
+    whateverExpanded.push(whateverShuffled[i % whateverShuffled.length]);
+  }
+  const queue: string[] = [];
+  for (let i = 0; i < otherShuffled.length; i++) {
+    queue.push(whateverExpanded[i], otherShuffled[i]);
+  }
+  return queue;
+}
+
+function createDareQueue() {
+  let queue = buildDareQueue();
+  return {
+    next(): string {
+      if (queue.length === 0) queue = buildDareQueue();
+      return queue.shift()!;
+    },
+  };
 }
 
 const PUNISHMENTS = [
@@ -60,6 +89,7 @@ export default function DarePage({ onBack }: DarePageProps) {
   const [skipsRemaining, setSkipsRemaining] = useState(SKIPS_INITIAL);
   const [showNoSkipsMessage, setShowNoSkipsMessage] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const dareQueueRef = useRef(createDareQueue());
 
   const handleBackClick = () => {
     if (isNavigating) return;
@@ -73,7 +103,7 @@ export default function DarePage({ onBack }: DarePageProps) {
     if (phase !== 'spinning') return;
     const timer = setTimeout(() => {
       setPhase('revealed');
-      setCurrentDare(pickRandomDare());
+      setCurrentDare(dareQueueRef.current.next());
     }, 5000);
     return () => clearTimeout(timer);
   }, [phase]);
@@ -94,7 +124,7 @@ export default function DarePage({ onBack }: DarePageProps) {
   const handleSkip = () => {
     if (skipsRemaining > 0) {
       setSkipsRemaining((s) => s - 1);
-      setCurrentDare(pickRandomDare());
+      setCurrentDare(dareQueueRef.current.next());
     } else {
       setShowNoSkipsMessage(true);
     }
